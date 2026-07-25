@@ -45,7 +45,7 @@ export async function onRequest(context) {
   const base64Payload = btoa(rawTextPayload);
 
   // 4. Return response with V2Ray subscription headers
-  const profileTitle = "Personal Feed";
+  const profileTitle = "svg Collection";
 
   return new Response(base64Payload, {
     status: 200,

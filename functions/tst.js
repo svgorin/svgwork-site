@@ -1,4 +1,4 @@
-  const nodeLinks = [
+ const nodeLinks = [
 
 //ilpt2xhttp-firstx
 "vless://4e1e74bb-df9d-43ac-945e-890497369d7a@ilpt2.svgrn.work:443?type=xhttp&encryption=none&path=%2Fo8tXBUV0Qe&host=&mode=packet-up&security=tls#%ilpt2-xhttp",
@@ -20,9 +20,9 @@
 "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK"
   ];
 
-
   // Join into a single string separated by newlines
   const rawTextPayload = nodeLinks.join("\n");
+
 
   // 3. Base64 encode the payload (compatible with standard Node/V2Ray runtime)
   const base64Payload = btoa(rawTextPayload);
