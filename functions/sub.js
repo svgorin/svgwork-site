@@ -19,7 +19,7 @@ export async function onRequest(context) {
     const nodeLinks = [
 
 //ilpt2xhttp-firstx
-"vless://4e1e74bb-df9d-43ac-945e-890497369d7a@ilpt2.svgrn.work:443?type=xhttp&encryption=none&path=%2Fo8tXBUV0Qe&host=&mode=packet-up&security=tls#%ilpt2-xhttp",
+"vless://4e1e74bb-df9d-43ac-945e-890497369d7a@ilpt2.svgrn.work:443?type=xhttp&encryption=none&path=%2Fo8tXBUV0Qe&host=&mode=packet-up&security=tls#ilpt2-xhttp",
 
 //ilpt2 latest iphone/mtsMsk bypass
 
