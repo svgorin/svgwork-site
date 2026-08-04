@@ -35,7 +35,12 @@ export async function onRequest(context) {
 
 // Timeweb
 
-"vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK"
+"vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK",
+
+// ILPT2-reality
+vless://4e1e74bb-df9d-43ac-945e-890497369d7a@185.28.152.
+  61:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-
+  vision&pbk=Pg9mXzrcCaW6lEYs9IztnM8H5bj_i0OcFIG2QIqNLxs&sni=dl.google.com&sid=84e052553543594e#ilpt2-reality
   ];
 
   // Join into a single string separated by newlines
