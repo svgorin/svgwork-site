@@ -87,3 +87,13 @@ Since the repository is private to protect your access keys, configure one of th
    git clone https://<YOUR_PAT>@github.com/username/svgwork-site.git /var/www/svgwork-site
    ```
 
+
+
+
+
+  ### Future Updates:
+
+  Whenever you push new node updates to GitHub, you can just log in and re-run /opt/svgwork-site's pull rules, or run
+  deploy_sub_server.sh again to refresh and restart the service!
+
+
