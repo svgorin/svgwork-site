@@ -1,0 +1,13 @@
+[Unit]
+Description=Simple Node.js VPN Subscription Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/svgwork-site
+ExecStart=/usr/bin/node /var/www/svgwork-site/simple_sub.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
