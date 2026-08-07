@@ -97,3 +97,13 @@ Since the repository is private to protect your access keys, configure one of th
   deploy_sub_server.sh again to refresh and restart the service!
 
 
+bash /opt/svgwork-site/deploy_sub_server.sh
+
+
+  or
+
+    cd /opt/svgwork-site/
+    ./deploy_sub_server.sh
+
+
+
