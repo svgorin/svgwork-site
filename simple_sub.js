@@ -6,12 +6,12 @@ const profileTitleBase64 = "base64:" + Buffer.from(profileTitle).toString('base6
 
 const nodeLinks = [
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Pf-AYuI9dT31I7ZlI5NVJISzTw5ahG-jw-iMxjSsSTk&sni=md-2.svgrn.work&sid=b2e9cd1f5a684703#md0708reality",
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=ws&security=tls&path=%2F46469%2FUKxNbRsRyJ&host=md.svgrn.work&encryption=none#md0708ws",
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=xhttp&encryption=none&path=%2FVEQodnEXkv&host=md.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#md0708xhttp",
-  "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=grpc&security=tls&serviceName=%2F22899%2Fo0GdKCj7h3&authority=md.svgrn.work#md0708trojan",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=ws&security=tls&path=%2F46469%2FUKxNbRsRyJ&host=md.svgrn.work&sni=md.svgrn.work&encryption=none#md0708ws",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=xhttp&encryption=none&path=%2FVEQodnEXkv&host=md.svgrn.work&sni=md.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#md0708xhttp",
+  "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=grpc&security=tls&serviceName=%2F22899%2Fo0GdKCj7h3&authority=md.svgrn.work&sni=md.svgrn.work#md0708trojan",
   "vless://57825bae-1d76-4be6-81ac-944734401557@seltel.svgrn.work:51732?security=reality&encryption=none&pbk=I_xfb96Z2i5Iz_HoSlD5PuxPNOP6AU33Qz5JR22xcyg&headerType=none&fp=chrome&type=tcp&sni=www.yandex.ru&sid=79f3f8d1cba04c49#MyREALITY-seltel",
   "vless://57825bae-1d76-4be6-81ac-944734401557@seltel.svgrn.work:51732?encryption=none&security=reality&sni=www.yandex.ru&fp=chrome&pbk=I_xfb96Z2i5Iz_HoSlD5PuxPNOP6AU33Qz5JR22xcyg&sid=79f3f8d1cba04c49&type=tcp#SELTEL-REALITY",
-  "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK"
+  "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&sni=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK"
 ];
 
 // Helper: Parse VLESS and Shadowsocks (ss://) URLs
