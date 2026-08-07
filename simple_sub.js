@@ -143,6 +143,7 @@ rules:
   
   # 3. Direct access for RU domains and Government Services
   - GEOSITE,category-gov-ru,DIRECT
+  - GEOSITE,ru,DIRECT
   - GEOIP,RU,DIRECT
   
   # 4. Fallback matches direct
@@ -205,7 +206,7 @@ function generateSingBoxJson(outbounds) {
           outbound: "AUTO-ROUTE-PROXY"
         },
         {
-          geosite: ["category-gov-ru"],
+          geosite: ["category-gov-ru", "ru"],
           geoip: ["ru"],
           outbound: "direct"
         },
