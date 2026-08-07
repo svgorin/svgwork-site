@@ -5,16 +5,10 @@ const profileTitle = "svg Collection";
 const profileTitleBase64 = "base64:" + Buffer.from(profileTitle).toString('base64');
 
 const nodeLinks = [
-  "vless://4e1e74bb-df9d-43ac-945e-890497369d7a@ilpt2.svgrn.work:443?type=xhttp&encryption=none&path=%2Fo8tXBUV0Qe&host=&mode=packet-up&security=tls#ilpt2-xhttp",
-  "vless://266185b0-844a-4d00-af3a-384660196d6f@ilpt2.svgrn.work:2053?fp=chrome&sni=ilpt2.svgrn.work&type=ws&path=%2FzG8sPvQe&host=ilpt2.svgrn.work&security=tls#ilpt2-04-07-2026",
-  "vless://57825bae-1d76-4be6-81ac-944734401557@seltel.svgrn.work:51732?security=reality&encryption=none&pbk=I_xfb96Z2i5Iz_HoSlD5PuxPNOP6AU33Qz5JR22xcyg&headerType=none&fp=chrome&type=tcp&sni=www.yandex.ru&sid=79f3f8d1cba04c49#MyREALITY-seltel",
-  "vless://57825bae-1d76-4be6-81ac-944734401557@seltel.svgrn.work:51732?encryption=none&security=reality&sni=www.yandex.ru&fp=chrome&pbk=I_xfb96Z2i5Iz_HoSlD5PuxPNOP6AU33Qz5JR22xcyk&sid=79f3f8d1cba04c49&type=tcp#SELTEL-REALITY",
-  "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK",
-  "vless://4e1e74bb-df9d-43ac-945e-890497369d7a@185.28.152.61:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Pg9mXzrcCaW6lEYs9IztnM8H5bj_i0OcFIG2QIqNLxs&sni=www.microsoft.com&sid=84e052553543594e#ilpt2-reality",
-  "vless://266185b0-844a-4d00-af3a-384660196d6f@ilpt2.svgrn.work:2053?fp=chrome&sni=ilpt2.svgrn.work&type=ws&path=%2FzG8sPvQe&host=ilpt2.svgrn.work&security=tls#url0327",
-
-  "vless://266185b0-844a-4d00-af3a-384660196d6f@ilpt2.svgrn.work:2053?fp=chrome&sni=ilpt2.svgrn.work&type=ws&path=%2FzG8sPvQe&host=ilpt2.svgrn.work&security=tls#url0327N"
-
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@37.221.67.234:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Pf-AYuI9dT31I7ZlI5NVJISzTw5ahG-jw-iMxjSsSTk&sni=www.microsoft.com&sid=b2e9cd1f5a684703#md0708reality",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@37.221.67.234:443?type=ws&security=tls&path=%2F46469%2FUKxNbRsRyJ&host=md.svgrn.work&encryption=none#md0708ws",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@37.221.67.234:443?type=xhttp&encryption=none&path=%2FVEQodnEXkv&host=md.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#md0708xhttp",
+  "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@37.221.67.234:443?type=grpc&security=tls&serviceName=%2F22899%2Fo0GdKCj7h3&authority=md.svgrn.work#md0708trojan"
 ];
 
 // Helper: Parse VLESS and Shadowsocks (ss://) URLs
