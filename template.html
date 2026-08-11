@@ -408,7 +408,7 @@
           <span class="material-symbols-outlined">sort_by_alpha</span> By Name
         </button>
         <button id="sort-votes-btn" class="sort-btn" onclick="sortTables('votes')">
-          <span class="material-symbols-outlined">trending_up</span> By Positive Votes
+          <span class="material-symbols-outlined">trending_up</span> By Net Score
         </button>
       </div>
     </div>
@@ -451,12 +451,12 @@
           const nameA = a.getAttribute('data-name') || '';
           const nameB = b.getAttribute('data-name') || '';
           
-          const votesA = parseInt(a.getAttribute('data-votes')) || 0;
-          const votesB = parseInt(b.getAttribute('data-votes')) || 0;
+          const scoreA = parseInt(a.getAttribute('data-score')) || 0;
+          const scoreB = parseInt(b.getAttribute('data-score')) || 0;
 
           if (mode === 'votes') {
-            if (votesB !== votesA) {
-              return votesB - votesA;
+            if (scoreB !== scoreA) {
+              return scoreB - scoreA;
             }
             return nameA.localeCompare(nameB);
           } else {
@@ -479,7 +479,7 @@
 
             const row = document.getElementById(`count-up-${nodeName}`).closest('tr');
             if (row) {
-              row.setAttribute('data-votes', data.up);
+              row.setAttribute('data-score', data.up - data.down);
             }
 
             if (currentSortMode === 'votes') {

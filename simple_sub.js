@@ -336,7 +336,7 @@ function serveHtmlPage(res) {
       for (const node of nodes) {
         const fb = feedback[node.name] || { up: 0, down: 0 };
         rowsHtml += `
-          <tr data-name="${node.name}" data-votes="${fb.up}">
+          <tr data-name="${node.name}" data-score="${fb.up - fb.down}">
             <td>
               <div class="node-info">
                 <div class="node-name">
