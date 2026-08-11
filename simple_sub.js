@@ -87,6 +87,23 @@ function parseNode(link) {
         obfs: searchParams.get("obfs"),
         obfsPassword: searchParams.get("obfs-password") || searchParams.get("obfs_password")
       };
+    } else if (protocol === "trojan") {
+      const password = parsed.username;
+      const host = parsed.hostname;
+      const port = parseInt(parsed.port);
+      const searchParams = parsed.searchParams;
+      return {
+        protocol: "trojan",
+        name,
+        password,
+        host,
+        port,
+        type: searchParams.get("type"),
+        security: searchParams.get("security") || "tls",
+        sni: searchParams.get("sni"),
+        serviceName: searchParams.get("serviceName") || searchParams.get("service_name"),
+        authority: searchParams.get("authority")
+      };
     }
   } catch (e) {
     return null;
@@ -107,6 +124,11 @@ function generateClashYaml(proxies) {
       if (p.obfs) {
         yaml += `    obfs: ${p.obfs}\n`;
         if (p["obfs-password"]) yaml += `    obfs-password: ${p["obfs-password"]}\n`;
+      }
+    } else if (p.protocol === "trojan") {
+      yaml += `  - name: "${p.name}"\n    type: trojan\n    server: ${p.server}\n    port: ${p.port}\n    password: ${p.password}\n    udp: true\n    tls: ${p.tls}\n    sni: ${p.sni}\n`;
+      if (p.network === "grpc") {
+        yaml += `    network: grpc\n    grpc-opts:\n      grpc-service-name: "${p.grpcServiceName}"\n`;
       }
     } else {
       yaml += `  - name: "${p.name}"\n    type: vless\n    server: ${p.server}\n    port: ${p.port}\n    uuid: ${p.uuid}\n    udp: true\n    tls: ${p.tls}\n    servername: ${p.servername}\n    network: ${p.network === "xhttp" ? "http" : p.network}\n`;
@@ -455,6 +477,18 @@ const server = http.createServer((req, res) => {
           if (parsed.obfsPassword) proxy["obfs-password"] = parsed.obfsPassword;
         }
         clashProxies.push(proxy);
+      } else if (parsed.protocol === "trojan") {
+        clashProxies.push({
+          protocol: "trojan",
+          name: parsed.name,
+          server: parsed.host,
+          port: parsed.port,
+          password: parsed.password,
+          tls: parsed.security !== "none",
+          sni: parsed.sni || parsed.host,
+          network: parsed.type,
+          grpcServiceName: parsed.serviceName
+        });
       } else {
         const proxy = {
           protocol: "vless",
@@ -531,6 +565,27 @@ const server = http.createServer((req, res) => {
           if (parsed.obfsPassword) {
             outbound.obfs.password = parsed.obfsPassword;
           }
+        }
+        sbOutbounds.push(outbound);
+      } else if (parsed.protocol === "trojan") {
+        const outbound = {
+          type: "trojan",
+          tag: parsed.name,
+          server: parsed.host,
+          server_port: parsed.port,
+          password: parsed.password
+        };
+        if (parsed.security !== "none") {
+          outbound.tls = {
+            enabled: true,
+            server_name: parsed.sni || parsed.host
+          };
+        }
+        if (parsed.type === "grpc") {
+          outbound.transport = {
+            type: "grpc",
+            service_name: parsed.serviceName
+          };
         }
         sbOutbounds.push(outbound);
       } else {
