@@ -253,6 +253,56 @@ function getLocationSubtitle(url, name) {
   return "🌐 Connection Node";
 }
 
+const DB_FILE = path.join(__dirname, 'feedback.json');
+
+function loadFeedback() {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    }
+  } catch (e) {
+    console.error("Error reading feedback DB:", e);
+  }
+  return {};
+}
+
+function saveFeedback(data) {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (e) {
+    console.error("Error writing feedback DB:", e);
+  }
+}
+
+function handleVoteRequest(reqUrl, res) {
+  const node = reqUrl.searchParams.get("node");
+  const type = reqUrl.searchParams.get("type");
+
+  if (!node || (type !== "up" && type !== "down")) {
+    res.writeHead(400, { "content-type": "application/json" });
+    res.end(JSON.stringify({ success: false, error: "Invalid parameters" }));
+    return;
+  }
+
+  const feedback = loadFeedback();
+  if (!feedback[node]) {
+    feedback[node] = { up: 0, down: 0 };
+  }
+
+  feedback[node][type] += 1;
+  saveFeedback(feedback);
+
+  res.writeHead(200, {
+    "content-type": "application/json",
+    "cache-control": "no-store, no-cache, must-revalidate"
+  });
+  res.end(JSON.stringify({
+    success: true,
+    up: feedback[node].up,
+    down: feedback[node].down
+  }));
+}
+
 function serveHtmlPage(res) {
   const templatePath = path.join(__dirname, 'template.html');
   fs.readFile(templatePath, 'utf8', (err, html) => {
@@ -275,6 +325,8 @@ function serveHtmlPage(res) {
       groups[subtitle].push({ link, name: parsed.name });
     }
 
+    const feedback = loadFeedback();
+
     // Build the collapsible group cards HTML
     let groupsHtml = '';
     for (const [location, nodes] of Object.entries(groups)) {
@@ -282,11 +334,24 @@ function serveHtmlPage(res) {
       
       let rowsHtml = '';
       for (const node of nodes) {
+        const fb = feedback[node.name] || { up: 0, down: 0 };
         rowsHtml += `
           <tr>
             <td>
               <div class="node-info">
-                <div class="node-name">${node.name}</div>
+                <div class="node-name">
+                  ${node.name}
+                  <div class="vote-container" data-node="${node.name}">
+                    <button class="vote-btn vote-up" onclick="vote('${node.name}', 'up')">
+                      <span class="vote-emoji">✅</span>
+                      <span class="vote-count" id="count-up-${node.name}">${fb.up}</span>
+                    </button>
+                    <button class="vote-btn vote-down" onclick="vote('${node.name}', 'down')">
+                      <span class="vote-emoji">👎</span>
+                      <span class="vote-count" id="count-down-${node.name}">${fb.down}</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </td>
             <td class="action-cell">
@@ -335,7 +400,13 @@ const server = http.createServer((req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = reqUrl.pathname;
 
-  // 1. HTML page request under the pure key segment
+  // 1. Vote API endpoint
+  if (pathname === `/${SECRET_KEY}/vote`) {
+    handleVoteRequest(reqUrl, res);
+    return;
+  }
+
+  // 2. HTML page request under the pure key segment
   if (pathname === `/${SECRET_KEY}`) {
     serveHtmlPage(res);
     return;
