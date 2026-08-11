@@ -8,7 +8,7 @@ const profileTitleBase64 = "base64:" + Buffer.from(profileTitle).toString('base6
 
 const nodeLinks = require('./node_links');
 
-// Helper: Parse VLESS and Shadowsocks (ss://) URLs
+// Helper: Parse VLESS, Shadowsocks (ss://) and Hysteria 2 (hysteria2://) URLs
 function parseNode(link) {
   try {
     const parsed = new URL(link);
@@ -72,6 +72,21 @@ function parseNode(link) {
         password: password || rawUser,
         prefix: prefix || null
       };
+    } else if (protocol === "hysteria2" || protocol === "hysteria") {
+      const password = parsed.username || parsed.password;
+      const host = parsed.hostname;
+      const port = parseInt(parsed.port);
+      const searchParams = parsed.searchParams;
+      return {
+        protocol: "hysteria2",
+        name,
+        password,
+        host,
+        port,
+        sni: searchParams.get("sni"),
+        obfs: searchParams.get("obfs"),
+        obfsPassword: searchParams.get("obfs-password") || searchParams.get("obfs_password")
+      };
     }
   } catch (e) {
     return null;
@@ -86,6 +101,13 @@ function generateClashYaml(proxies) {
   for (const p of proxies) {
     if (p.protocol === "ss") {
       yaml += `  - name: "${p.name}"\n    type: ss\n    server: ${p.server}\n    port: ${p.port}\n    cipher: ${p.cipher}\n    password: ${p.password}\n    udp: true\n`;
+    } else if (p.protocol === "hysteria2") {
+      yaml += `  - name: "${p.name}"\n    type: hysteria2\n    server: ${p.server}\n    port: ${p.port}\n    password: ${p.password}\n`;
+      if (p.sni) yaml += `    sni: ${p.sni}\n`;
+      if (p.obfs) {
+        yaml += `    obfs: ${p.obfs}\n`;
+        if (p["obfs-password"]) yaml += `    obfs-password: ${p["obfs-password"]}\n`;
+      }
     } else {
       yaml += `  - name: "${p.name}"\n    type: vless\n    server: ${p.server}\n    port: ${p.port}\n    uuid: ${p.uuid}\n    udp: true\n    tls: ${p.tls}\n    servername: ${p.servername}\n    network: ${p.network === "xhttp" ? "http" : p.network}\n`;
       if (p.flow) yaml += `    flow: ${p.flow}\n`;
@@ -348,6 +370,20 @@ const server = http.createServer((req, res) => {
           cipher: parsed.method,
           password: parsed.password
         });
+      } else if (parsed.protocol === "hysteria2") {
+        const proxy = {
+          protocol: "hysteria2",
+          name: parsed.name,
+          server: parsed.host,
+          port: parsed.port,
+          password: parsed.password
+        };
+        if (parsed.sni) proxy.sni = parsed.sni;
+        if (parsed.obfs) {
+          proxy.obfs = parsed.obfs;
+          if (parsed.obfsPassword) proxy["obfs-password"] = parsed.obfsPassword;
+        }
+        clashProxies.push(proxy);
       } else {
         const proxy = {
           protocol: "vless",
@@ -401,6 +437,29 @@ const server = http.createServer((req, res) => {
         };
         if (parsed.prefix) {
           outbound.prefix = parsed.prefix;
+        }
+        sbOutbounds.push(outbound);
+      } else if (parsed.protocol === "hysteria2") {
+        const outbound = {
+          type: "hysteria2",
+          tag: parsed.name,
+          server: parsed.host,
+          server_port: parsed.port,
+          password: parsed.password
+        };
+        if (parsed.sni) {
+          outbound.tls = {
+            enabled: true,
+            server_name: parsed.sni
+          };
+        }
+        if (parsed.obfs) {
+          outbound.obfs = {
+            type: parsed.obfs
+          };
+          if (parsed.obfsPassword) {
+            outbound.obfs.password = parsed.obfsPassword;
+          }
         }
         sbOutbounds.push(outbound);
       } else {
