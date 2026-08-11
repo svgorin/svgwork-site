@@ -347,7 +347,7 @@ function serveHtmlPage(res) {
                       <span class="vote-count" id="count-up-${node.name}">${fb.up}</span>
                     </button>
                     <button class="vote-btn vote-down" onclick="vote('${node.name}', 'down')">
-                      <span class="vote-emoji">👎</span>
+                      <span class="vote-emoji">❌</span>
                       <span class="vote-count" id="count-down-${node.name}">${fb.down}</span>
                     </button>
                   </div>
