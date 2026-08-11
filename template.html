@@ -230,23 +230,7 @@
       background: rgba(239, 68, 68, 0.04);
     }
 
-    .vote-btn.active.vote-up {
-      background: rgba(16, 185, 129, 0.1);
-      border-color: var(--accent);
-      color: #34d399;
-    }
 
-    .vote-btn.active.vote-down {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: #ef4444;
-      color: #f87171;
-    }
-
-    .vote-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
 
     .vote-emoji {
       font-size: 0.85rem;
@@ -378,44 +362,7 @@
   </div>
 
   <script>
-    // Load voted state from localStorage
-    function getVotedNodes() {
-      try {
-        return JSON.parse(localStorage.getItem('vpn_votes') || '{}');
-      } catch (e) {
-        return {};
-      }
-    }
-
-    function setVotedNode(nodeName, type) {
-      try {
-        const votes = getVotedNodes();
-        votes[nodeName] = type;
-        localStorage.setItem('vpn_votes', JSON.stringify(votes));
-      } catch (e) {}
-    }
-
-    // Highlight already voted buttons and disable options
-    document.addEventListener('DOMContentLoaded', () => {
-      const votes = getVotedNodes();
-      for (const [nodeName, type] of Object.entries(votes)) {
-        const container = document.querySelector(`.vote-container[data-node="${nodeName}"]`);
-        if (container) {
-          const btn = container.querySelector(`.vote-${type}`);
-          if (btn) btn.classList.add('active');
-          container.querySelectorAll('.vote-btn').forEach(b => b.disabled = true);
-        }
-      }
-    });
-
     function vote(nodeName, type) {
-      const votes = getVotedNodes();
-      if (votes[nodeName]) return; // Already voted
-
-      const container = document.querySelector(`.vote-container[data-node="${nodeName}"]`);
-      const buttons = container.querySelectorAll('.vote-btn');
-      buttons.forEach(b => b.disabled = true);
-
       const secretKey = window.location.pathname.split('/').filter(Boolean).pop();
       fetch(`/${secretKey}/vote?node=${encodeURIComponent(nodeName)}&type=${type}`)
         .then(res => res.json())
@@ -423,18 +370,10 @@
           if (data.success) {
             document.getElementById(`count-up-${nodeName}`).textContent = data.up;
             document.getElementById(`count-down-${nodeName}`).textContent = data.down;
-            
-            const activeBtn = container.querySelector(`.vote-${type}`);
-            if (activeBtn) activeBtn.classList.add('active');
-            
-            setVotedNode(nodeName, type);
-          } else {
-            buttons.forEach(b => b.disabled = false);
           }
         })
         .catch(err => {
           console.error('Error submitting vote:', err);
-          buttons.forEach(b => b.disabled = false);
         });
     }
 
