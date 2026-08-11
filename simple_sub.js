@@ -273,8 +273,16 @@ function serveHtmlPage(res) {
 
 const server = http.createServer((req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  const userKey = reqUrl.searchParams.get("key");
+  const pathname = reqUrl.pathname;
 
+  // 1. HTML page request under the pure key segment
+  if (pathname === `/${SECRET_KEY}`) {
+    serveHtmlPage(res);
+    return;
+  }
+
+  // 2. Standard subscription authentication
+  const userKey = reqUrl.searchParams.get("key");
   const isAuthorized = (SECRET_KEY && userKey === SECRET_KEY) || req.url.includes("moscowfriend");
 
   if (!isAuthorized) {
@@ -285,16 +293,6 @@ const server = http.createServer((req, res) => {
 
   const userAgent = (req.headers['user-agent'] || "").toLowerCase();
   const format = reqUrl.searchParams.get("format") || "";
-
-  const isBrowser = userAgent.includes("mozilla") || userAgent.includes("chrome") || userAgent.includes("safari") || userAgent.includes("edge") || userAgent.includes("opera");
-  const isClient = userAgent.includes("clash") || userAgent.includes("mihomo") || userAgent.includes("sing-box") || userAgent.includes("hiddify") || userAgent.includes("karing") || userAgent.includes("v2ray") || userAgent.includes("shadowrocket") || userAgent.includes("v2box");
-
-  const wantsHtml = format === "html" || reqUrl.searchParams.get("html") === "true" || (isBrowser && !isClient && format !== "clash" && format !== "sing-box");
-
-  if (wantsHtml) {
-    serveHtmlPage(res);
-    return;
-  }
 
   // 1. Clash / Mihomo Clients
   if (format === "clash" || userAgent.includes("clash") || userAgent.includes("mihomo")) {
