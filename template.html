@@ -68,6 +68,71 @@
       font-size: 1.05rem;
     }
 
+    /* Subscription Link Card */
+    .sub-link-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(16, 185, 129, 0.03) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .sub-link-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .sub-link-header h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .sub-link-header .material-symbols-outlined {
+      color: var(--primary);
+      font-size: 24px;
+    }
+
+    .sub-link-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .sub-link-input-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sub-url-input {
+      flex: 1;
+      min-width: 250px;
+      background: rgba(11, 15, 25, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 0.65rem 1rem;
+      color: #9ca3af;
+      font-family: monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .sub-url-input:focus {
+      border-color: var(--primary);
+    }
+
+    .sub-copy-btn {
+      padding: 0.65rem 1.25rem !important;
+      font-weight: 600;
+      font-size: 0.875rem !important;
+      gap: 0.5rem;
+    }
+
     /* Controls & Sorting */
     .controls-bar {
       display: flex;
@@ -401,6 +466,21 @@
       <p>Select and copy private VPN configurations for your device</p>
     </header>
 
+    <!-- Subscription Link Card -->
+    <div class="sub-link-card">
+      <div class="sub-link-header">
+        <span class="material-symbols-outlined">sync</span>
+        <h3>Automatic Subscription Link</h3>
+      </div>
+      <p class="sub-link-desc">Use this link in your VPN client to import and auto-sync all nodes at once.</p>
+      <div class="sub-link-input-group">
+        <input type="text" id="sub-url-input" class="sub-url-input" readonly value="">
+        <button class="copy-btn sub-copy-btn" onclick="copySubLink(this)">
+          <span class="material-symbols-outlined">content_copy</span> Copy Link
+        </button>
+      </div>
+    </div>
+
     <div class="controls-bar">
       <span class="control-label">Sort nodes within regions:</span>
       <div class="sort-buttons">
@@ -419,7 +499,11 @@
 
     <div class="info-card">
       <h3><span class="material-symbols-outlined">info</span> Setup Instructions</h3>
-      <p>Click on any region header to expand/collapse the nodes. Click the copy button next to a node to copy its configuration link. Then open your client application (e.g., <strong>v2RayTun</strong>, <strong>Hiddify</strong>, <strong>Karing</strong>, <strong>Incy</strong>, or <strong>Rabbit hole</strong>) and choose "Import config from clipboard" or add a new profile.</p>
+      <p style="margin-bottom: 0.75rem;">You have two ways to configure your client application (<strong>Incy</strong>, <strong>Rabbit hole</strong>, <strong>v2RayTun</strong>, <strong>Hiddify</strong>, or <strong>Karing</strong>):</p>
+      <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); list-style-type: disc;">
+        <li style="margin-bottom: 0.5rem;"><strong style="color: var(--text-main);">Option 1 (Recommended):</strong> Copy the <strong>Automatic Subscription Link</strong> above and add it as a subscription profile/group in your app. This imports all servers and auto-syncs any future updates.</li>
+        <li><strong style="color: var(--text-main);">Option 2:</strong> Click the copy button next to an individual node to copy its single URL, then choose "Import config from clipboard" in your app.</li>
+      </ul>
 
       <h3 style="margin-top: 1.25rem;"><span class="material-symbols-outlined">rate_review</span> Connection Feedback</h3>
       <p>Click the ✅ button next to a server to indicate that it works for you, or ❌ if it doesn't. Counters update in real-time to help everyone choose the best-performing connection.</p>
@@ -433,6 +517,36 @@
 
   <script>
     let currentSortMode = 'name';
+
+    // Populate sub link URL on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const secretKey = window.location.pathname.split('/').filter(Boolean).pop();
+      const subUrlInput = document.getElementById('sub-url-input');
+      if (subUrlInput) {
+        subUrlInput.value = `${window.location.origin}/sub?key=${secretKey}`;
+      }
+    });
+
+    function copySubLink(button) {
+      const input = document.getElementById('sub-url-input');
+      navigator.clipboard.writeText(input.value).then(() => {
+        button.classList.add('copied');
+        const icon = button.querySelector('.material-symbols-outlined');
+        const originalContent = button.innerHTML;
+        button.innerHTML = '<span class="material-symbols-outlined">check</span> Copied!';
+
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+
+        setTimeout(() => {
+          button.classList.remove('copied');
+          button.innerHTML = originalContent;
+          toast.classList.remove('show');
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy sub link:', err);
+      });
+    }
 
     function sortTables(mode) {
       currentSortMode = mode;
