@@ -1,23 +1,12 @@
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
 const SECRET_KEY = "Im7R9FYpBFwXmKX6";
 const profileTitle = "svg Collection";
 const profileTitleBase64 = "base64:" + Buffer.from(profileTitle).toString('base64');
 
-const nodeLinks = [
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Y_YpgteBD1JQJBjtrESolnk8mbrVaY4mb6nuXi2ztSU&sni=veesp-2.svgrn.work&sid=de8b8bafaa0b4acb#LV0808reality",
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?type=ws&security=tls&path=%2F13117%2F8eJYdnO212&host=veesp.svgrn.work&sni=veesp.svgrn.work&encryption=none#LV0808ws",
-  "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?type=grpc&security=tls&serviceName=%2F36395%2FD86ifozy18&authority=veesp.svgrn.work&sni=veesp.svgrn.work#LV0808trojan",
-  "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?sni=veesp.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#LV0808hy2",
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Pf-AYuI9dT31I7ZlI5NVJISzTw5ahG-jw-iMxjSsSTk&sni=md-2.svgrn.work&sid=b2e9cd1f5a684703#md0708reality",
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=ws&security=tls&path=%2F46469%2FUKxNbRsRyJ&host=md.svgrn.work&sni=md.svgrn.work&encryption=none#md0708ws",
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=xhttp&encryption=none&path=%2FVEQodnEXkv&host=md.svgrn.work&sni=md.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#md0708xhttp",
-  "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=grpc&security=tls&serviceName=%2F22899%2Fo0GdKCj7h3&authority=md.svgrn.work&sni=md.svgrn.work#md0708trojan",
-  "vless://57825bae-1d76-4be6-81ac-944734401557@seltel.svgrn.work:51732?security=reality&encryption=none&pbk=I_xfb96Z2i5Iz_HoSlD5PuxPNOP6AU33Qz5JR22xcyg&headerType=none&fp=chrome&type=tcp&sni=www.yandex.ru&sid=79f3f8d1cba04c49#MyREALITY-seltel",
-  "vless://57825bae-1d76-4be6-81ac-944734401557@seltel.svgrn.work:51732?encryption=none&security=reality&sni=www.yandex.ru&fp=chrome&pbk=I_xfb96Z2i5Iz_HoSlD5PuxPNOP6AU33Qz5JR22xcyk&sid=79f3f8d1cba04c49&type=tcp#SELTEL-REALITY",
-  "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&sni=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK",
-"vless://266185b0-844a-4d00-af3a-384660196d6f@ilpt2.svgrn.work:2053?fp=chrome&sni=ilpt2.svgrn.work&type=ws&path=%2FzG8sPvQe&host=ilpt2.svgrn.work&security=tls#url0327IL"
-];
+const nodeLinks = require('./node_links');
 
 // Helper: Parse VLESS and Shadowsocks (ss://) URLs
 function parseNode(link) {
@@ -224,6 +213,64 @@ function generateSingBoxJson(outbounds) {
   return JSON.stringify(config, null, 2);
 }
 
+function getLocationSubtitle(url, name) {
+  const u = url.toLowerCase();
+  const n = name.toLowerCase();
+  
+  if (n.includes("md") || u.includes("md.svgrn.work") || u.includes("md-2.svgrn.work")) {
+    return "🇲🇩 MD, Moldova";
+  } else if (n.includes("lv") || u.includes("veesp.svgrn.work") || u.includes("veesp-2.svgrn.work")) {
+    return "🇱🇻 LV, Latvia";
+  } else if (n.includes("il") || u.includes("ilpt2.svgrn.work") || u.includes("saltydyar.click")) {
+    return "🇮🇱 IL, Israel";
+  } else if (n.includes("seltel") || u.includes("seltel.svgrn.work")) {
+    return "🇷🇺 RU, Russia (Selectel)";
+  } else if (n.includes("timeweb") || u.includes("timeweb.svgrn.work")) {
+    return "🇷🇺 RU, Russia (Timeweb)";
+  }
+  return "🌐 Connection Node";
+}
+
+function serveHtmlPage(res) {
+  const templatePath = path.join(__dirname, 'template.html');
+  fs.readFile(templatePath, 'utf8', (err, html) => {
+    if (err) {
+      res.writeHead(500, { "content-type": "text/plain" });
+      res.end("Internal Server Error: Missing Template");
+      return;
+    }
+
+    let tableRows = '';
+    for (const link of nodeLinks) {
+      const parsed = parseNode(link);
+      if (!parsed) continue;
+
+      const subtitle = getLocationSubtitle(link, parsed.name);
+      tableRows += `
+          <tr>
+            <td>
+              <div class="node-info">
+                <div class="node-name">${parsed.name}</div>
+                <div class="node-sub">${subtitle}</div>
+              </div>
+            </td>
+            <td class="action-cell">
+              <button class="copy-btn" onclick="copyToClipboard(this, \`${link}\`)">
+                <span class="material-symbols-outlined">content_copy</span>
+              </button>
+            </td>
+          </tr>`;
+    }
+
+    const renderedHtml = html.replace('<!-- TABLE_ROWS_PLACEHOLDER -->', tableRows);
+    res.writeHead(200, {
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store, no-cache, must-revalidate"
+    });
+    res.end(renderedHtml);
+  });
+}
+
 const server = http.createServer((req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const userKey = reqUrl.searchParams.get("key");
@@ -238,6 +285,16 @@ const server = http.createServer((req, res) => {
 
   const userAgent = (req.headers['user-agent'] || "").toLowerCase();
   const format = reqUrl.searchParams.get("format") || "";
+
+  const isBrowser = userAgent.includes("mozilla") || userAgent.includes("chrome") || userAgent.includes("safari") || userAgent.includes("edge") || userAgent.includes("opera");
+  const isClient = userAgent.includes("clash") || userAgent.includes("mihomo") || userAgent.includes("sing-box") || userAgent.includes("hiddify") || userAgent.includes("karing") || userAgent.includes("v2ray") || userAgent.includes("shadowrocket") || userAgent.includes("v2box");
+
+  const wantsHtml = format === "html" || reqUrl.searchParams.get("html") === "true" || (isBrowser && !isClient && format !== "clash" && format !== "sing-box");
+
+  if (wantsHtml) {
+    serveHtmlPage(res);
+    return;
+  }
 
   // 1. Clash / Mihomo Clients
   if (format === "clash" || userAgent.includes("clash") || userAgent.includes("mihomo")) {
