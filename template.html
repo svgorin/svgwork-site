@@ -188,6 +188,46 @@
       font-size: 16px;
     }
 
+    .controls-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 0.4rem 1rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .filter-btn.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      color: #34d399;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .filter-btn .material-symbols-outlined {
+      font-size: 16px;
+    }
+
     /* Collapsible Group Cards */
     .group-card {
       background: var(--card-bg);
@@ -482,8 +522,11 @@
     </div>
 
     <div class="controls-bar">
-      <span class="control-label">Sort nodes within regions:</span>
-      <div class="sort-buttons">
+      <span class="control-label">Filter & Sort Nodes:</span>
+      <div class="controls-group">
+        <button id="filter-good-btn" class="filter-btn" onclick="toggleFilterGood()">
+          <span class="material-symbols-outlined">verified</span> Good Only (>= 2)
+        </button>
         <button id="sort-name-btn" class="sort-btn active" onclick="sortTables('name')">
           <span class="material-symbols-outlined">sort_by_alpha</span> By Name
         </button>
@@ -517,6 +560,33 @@
 
   <script>
     let currentSortMode = 'name';
+    let filterGoodActive = false;
+
+    function toggleFilterGood() {
+      filterGoodActive = !filterGoodActive;
+      const filterBtn = document.getElementById('filter-good-btn');
+      if (filterBtn) filterBtn.classList.toggle('active', filterGoodActive);
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const rows = document.querySelectorAll('#node-groups tbody tr');
+      rows.forEach(row => {
+        const score = parseInt(row.getAttribute('data-score')) || 0;
+        let show = true;
+        if (filterGoodActive && score < 2) {
+          show = false;
+        }
+        row.style.display = show ? '' : 'none';
+      });
+
+      const groupCards = document.querySelectorAll('#node-groups .group-card');
+      groupCards.forEach(card => {
+        const tbody = card.querySelector('tbody');
+        const visibleRows = Array.from(tbody.querySelectorAll('tr')).filter(r => r.style.display !== 'none');
+        card.style.display = visibleRows.length > 0 ? '' : 'none';
+      });
+    }
 
     // Populate sub link URL on load
     document.addEventListener('DOMContentLoaded', () => {
@@ -599,6 +669,8 @@
             if (currentSortMode === 'votes') {
               sortTables('votes');
             }
+
+            applyFilters();
           }
         })
         .catch(err => {
