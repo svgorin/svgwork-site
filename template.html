@@ -68,6 +68,61 @@
       font-size: 1.05rem;
     }
 
+    /* Controls & Sorting */
+    .controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 0 0.5rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .control-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .sort-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .sort-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 0.4rem 1rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .sort-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sort-btn.active {
+      background: var(--primary-glow);
+      border-color: var(--primary);
+      color: var(--text-main);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .sort-btn .material-symbols-outlined {
+      font-size: 16px;
+    }
+
     /* Collapsible Group Cards */
     .group-card {
       background: var(--card-bg);
@@ -346,6 +401,18 @@
       <p>Select and copy private VPN configurations for your device</p>
     </header>
 
+    <div class="controls-bar">
+      <span class="control-label">Sort nodes within regions:</span>
+      <div class="sort-buttons">
+        <button id="sort-name-btn" class="sort-btn active" onclick="sortTables('name')">
+          <span class="material-symbols-outlined">sort_by_alpha</span> By Name
+        </button>
+        <button id="sort-votes-btn" class="sort-btn" onclick="sortTables('votes')">
+          <span class="material-symbols-outlined">trending_up</span> By Positive Votes
+        </button>
+      </div>
+    </div>
+
     <div id="node-groups">
       <!-- GROUPS_PLACEHOLDER -->
     </div>
@@ -353,6 +420,9 @@
     <div class="info-card">
       <h3><span class="material-symbols-outlined">info</span> Setup Instructions</h3>
       <p>Click on any region header to expand/collapse the nodes. Click the copy button next to a node to copy its configuration link. Then open your client application (e.g., <strong>v2RayTun</strong>, <strong>Hiddify</strong>, <strong>Karing</strong>, <strong>Incy</strong>, or <strong>Rabbit hole</strong>) and choose "Import config from clipboard" or add a new profile.</p>
+
+      <h3 style="margin-top: 1.25rem;"><span class="material-symbols-outlined">rate_review</span> Connection Feedback</h3>
+      <p>Click the ✅ button next to a server to indicate that it works for you, or 👎 if it doesn't. Counters update in real-time to help everyone choose the best-performing connection.</p>
     </div>
   </div>
 
@@ -362,6 +432,42 @@
   </div>
 
   <script>
+    let currentSortMode = 'name';
+
+    function sortTables(mode) {
+      currentSortMode = mode;
+      
+      const nameBtn = document.getElementById('sort-name-btn');
+      const votesBtn = document.getElementById('sort-votes-btn');
+      if (nameBtn) nameBtn.classList.toggle('active', mode === 'name');
+      if (votesBtn) votesBtn.classList.toggle('active', mode === 'votes');
+
+      const tables = document.querySelectorAll('#node-groups table');
+      tables.forEach(table => {
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+          const nameA = a.getAttribute('data-name') || '';
+          const nameB = b.getAttribute('data-name') || '';
+          
+          const votesA = parseInt(a.getAttribute('data-votes')) || 0;
+          const votesB = parseInt(b.getAttribute('data-votes')) || 0;
+
+          if (mode === 'votes') {
+            if (votesB !== votesA) {
+              return votesB - votesA;
+            }
+            return nameA.localeCompare(nameB);
+          } else {
+            return nameA.localeCompare(nameB);
+          }
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+      });
+    }
+
     function vote(nodeName, type) {
       const secretKey = window.location.pathname.split('/').filter(Boolean).pop();
       fetch(`/${secretKey}/vote?node=${encodeURIComponent(nodeName)}&type=${type}`)
@@ -370,6 +476,15 @@
           if (data.success) {
             document.getElementById(`count-up-${nodeName}`).textContent = data.up;
             document.getElementById(`count-down-${nodeName}`).textContent = data.down;
+
+            const row = document.getElementById(`count-up-${nodeName}`).closest('tr');
+            if (row) {
+              row.setAttribute('data-votes', data.up);
+            }
+
+            if (currentSortMode === 'votes') {
+              sortTables('votes');
+            }
           }
         })
         .catch(err => {
