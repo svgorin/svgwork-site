@@ -240,29 +240,67 @@ function serveHtmlPage(res) {
       return;
     }
 
-    let tableRows = '';
+    // Group links by location
+    const groups = {};
     for (const link of nodeLinks) {
       const parsed = parseNode(link);
       if (!parsed) continue;
 
       const subtitle = getLocationSubtitle(link, parsed.name);
-      tableRows += `
+      if (!groups[subtitle]) {
+        groups[subtitle] = [];
+      }
+      groups[subtitle].push({ link, name: parsed.name });
+    }
+
+    // Build the collapsible group cards HTML
+    let groupsHtml = '';
+    for (const [location, nodes] of Object.entries(groups)) {
+      const countText = `${nodes.length} node${nodes.length > 1 ? 's' : ''}`;
+      
+      let rowsHtml = '';
+      for (const node of nodes) {
+        rowsHtml += `
           <tr>
             <td>
               <div class="node-info">
-                <div class="node-name">${parsed.name}</div>
-                <div class="node-sub">${subtitle}</div>
+                <div class="node-name">${node.name}</div>
               </div>
             </td>
             <td class="action-cell">
-              <button class="copy-btn" onclick="copyToClipboard(this, \`${link}\`)">
+              <button class="copy-btn" onclick="copyToClipboard(this, \`${node.link}\`)">
                 <span class="material-symbols-outlined">content_copy</span>
               </button>
             </td>
           </tr>`;
+      }
+
+      groupsHtml += `
+    <div class="group-card">
+      <div class="group-header" onclick="toggleGroup(this)">
+        <div class="group-title">
+          <span class="location-name">${location}</span>
+          <span class="node-count">${countText}</span>
+        </div>
+        <span class="material-symbols-outlined chevron">expand_more</span>
+      </div>
+      <div class="group-content">
+        <table>
+          <thead>
+            <tr>
+              <th>Connection Profile</th>
+              <th class="action-cell">Copy Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
     }
 
-    const renderedHtml = html.replace('<!-- TABLE_ROWS_PLACEHOLDER -->', tableRows);
+    const renderedHtml = html.replace('<!-- GROUPS_PLACEHOLDER -->', groupsHtml);
     res.writeHead(200, {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "no-store, no-cache, must-revalidate"
