@@ -273,9 +273,42 @@
       background: rgba(59, 130, 246, 0.15);
       color: var(--primary);
       padding: 0.25rem 0.65rem;
-      border-radius: 20px;
+      border-radius: 12px;
+    }
+
+    .ping-indicator {
+      font-size: 0.8rem;
       font-weight: 600;
-      letter-spacing: 0.02em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      margin-left: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+
+    .ping-indicator.testing {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    .ping-indicator.online {
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .ping-indicator.blocked {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     .chevron {
@@ -595,7 +628,43 @@
       if (subUrlInput) {
         subUrlInput.value = `${window.location.origin}/sub?key=${secretKey}`;
       }
+      testRegionsReachability();
     });
+
+    function testRegionsReachability() {
+      const cards = document.querySelectorAll('.group-card');
+      cards.forEach(async (card) => {
+        const testUrl = card.getAttribute('data-test-url');
+        const locationName = card.querySelector('.location-name').textContent;
+        const pingId = `ping-${locationName.replace(/[^a-zA-Z0-9]/g, '')}`;
+        const indicator = document.getElementById(pingId);
+        
+        if (!testUrl || !indicator) return;
+
+        indicator.className = 'ping-indicator testing';
+        indicator.innerHTML = '<span class="material-symbols-outlined spin" style="font-size: 14px; animation: spin 1.5s linear infinite;">sync</span> Testing...';
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+        const start = performance.now();
+        try {
+          await fetch(testUrl, {
+            mode: 'no-cors',
+            cache: 'no-store',
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          const duration = Math.round(performance.now() - start);
+          indicator.className = 'ping-indicator online';
+          indicator.innerHTML = `🟢 ${duration}ms`;
+        } catch (err) {
+          clearTimeout(timeoutId);
+          indicator.className = 'ping-indicator blocked';
+          indicator.innerHTML = '❌ Blocked';
+        }
+      });
+    }
 
     function copySubLink(button) {
       const input = document.getElementById('sub-url-input');

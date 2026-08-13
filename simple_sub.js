@@ -275,6 +275,15 @@ function getLocationSubtitle(url, name) {
   return "🌐 Connection Node";
 }
 
+function getLocationTestUrl(subtitle) {
+  if (subtitle.includes("MD, Moldova")) return "https://md.svgrn.work/";
+  if (subtitle.includes("LV, Latvia")) return "https://veesp.svgrn.work/";
+  if (subtitle.includes("IL, Israel")) return "https://ilpt2.svgrn.work/";
+  if (subtitle.includes("RU, Russia (Selectel)")) return "https://seltel.svgrn.work/";
+  if (subtitle.includes("RU, Russia (Timeweb)")) return "https://timeweb.svgrn.work/";
+  return "";
+}
+
 const DB_FILE = path.join(__dirname, 'feedback.json');
 
 function loadFeedback() {
@@ -353,6 +362,7 @@ function serveHtmlPage(res) {
     let groupsHtml = '';
     for (const [location, nodes] of Object.entries(groups)) {
       const countText = `${nodes.length} node${nodes.length > 1 ? 's' : ''}`;
+      const testUrl = getLocationTestUrl(location);
       
       let rowsHtml = '';
       for (const node of nodes) {
@@ -385,11 +395,12 @@ function serveHtmlPage(res) {
       }
 
       groupsHtml += `
-    <div class="group-card">
+    <div class="group-card" data-test-url="${testUrl}">
       <div class="group-header" onclick="toggleGroup(this)">
         <div class="group-title">
           <span class="location-name">${location}</span>
           <span class="node-count">${countText}</span>
+          <span class="ping-indicator" id="ping-${location.replace(/[^a-zA-Z0-9]/g, '')}">[Testing...]</span>
         </div>
         <span class="material-symbols-outlined chevron">expand_more</span>
       </div>
