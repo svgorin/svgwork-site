@@ -774,14 +774,15 @@
       navigator.clipboard.writeText(text).then(() => {
         button.classList.add('copied');
         const icon = button.querySelector('.material-symbols-outlined');
-        icon.textContent = 'check';
+        const originalIcon = icon ? icon.textContent : 'content_copy';
+        if (icon) icon.textContent = 'check';
 
         const toast = document.getElementById('toast');
         toast.classList.add('show');
 
         setTimeout(() => {
           button.classList.remove('copied');
-          icon.textContent = 'content_copy';
+          if (icon) icon.textContent = originalIcon;
           toast.classList.remove('show');
         }, 2000);
       }).catch(err => {

@@ -11,6 +11,64 @@ const nodeLinks = require('./node_links');
 // Helper: Parse VLESS, Shadowsocks (ss://) and Hysteria 2 (hysteria2://) URLs
 function parseNode(link) {
   try {
+    if (link.startsWith("wireguard://")) {
+      const hashIdx = link.indexOf("#");
+      const name = hashIdx !== -1 ? decodeURIComponent(link.substring(hashIdx + 1)) : "WireGuard";
+      const mainPart = hashIdx !== -1 ? link.substring(0, hashIdx) : link;
+      const withoutScheme = mainPart.substring("wireguard://".length);
+      const atIdx = withoutScheme.indexOf("@");
+
+      let privateKey = "";
+      let host = "";
+      let port = 51820;
+      let queryStr = "";
+
+      if (atIdx !== -1) {
+        privateKey = decodeURIComponent(withoutScheme.substring(0, atIdx));
+        const rest = withoutScheme.substring(atIdx + 1);
+        const qIdx = rest.indexOf("?");
+        const hostPort = qIdx !== -1 ? rest.substring(0, qIdx) : rest;
+        const hpParts = hostPort.split(":");
+        host = hpParts[0];
+        port = parseInt(hpParts[1]) || 51820;
+        queryStr = qIdx !== -1 ? rest.substring(qIdx) : "";
+      }
+
+      const dummyUrl = new URL("http://dummy.local/" + (queryStr.startsWith("?") ? queryStr : "?" + queryStr));
+      const searchParams = dummyUrl.searchParams;
+      const address = searchParams.get("address") || "10.0.0.2/32";
+      const publicKey = searchParams.get("publickey") || searchParams.get("publicKey") || "";
+      const dns = searchParams.get("dns") || "1.1.1.1, 1.0.0.1";
+      const mtu = parseInt(searchParams.get("mtu")) || 1420;
+      const allowedIPs = searchParams.get("allowedIPs") || "0.0.0.0/0, ::/0";
+
+      const wgConf = `[Interface]
+PrivateKey = ${privateKey}
+Address = ${address}
+DNS = ${dns}
+MTU = ${mtu}
+
+[Peer]
+PublicKey = ${publicKey}
+AllowedIPs = ${allowedIPs}
+Endpoint = ${host}:${port}
+`;
+
+      return {
+        protocol: "wireguard",
+        name,
+        privateKey,
+        host,
+        port,
+        address,
+        publicKey,
+        dns,
+        mtu,
+        allowedIPs,
+        wgConf
+      };
+    }
+
     const parsed = new URL(link);
     const protocol = parsed.protocol.replace(":", "");
     const name = decodeURIComponent(parsed.hash.substring(1));
@@ -130,6 +188,8 @@ function generateClashYaml(proxies) {
       if (p.network === "grpc") {
         yaml += `    network: grpc\n    grpc-opts:\n      grpc-service-name: "${p.grpcServiceName}"\n`;
       }
+    } else if (p.protocol === "wireguard") {
+      yaml += `  - name: "${p.name}"\n    type: wireguard\n    server: ${p.server}\n    port: ${p.port}\n    ip: ${p.ip}\n    public-key: "${p.publicKey}"\n    private-key: "${p.privateKey}"\n    udp: true\n    remote-dns-resolve: false\n    dns: [${p.dns}]\n    mtu: ${p.mtu}\n`;
     } else {
       yaml += `  - name: "${p.name}"\n    type: vless\n    server: ${p.server}\n    port: ${p.port}\n    uuid: ${p.uuid}\n    udp: true\n    tls: ${p.tls}\n    servername: ${p.servername}\n    network: ${p.network === "xhttp" ? "http" : p.network}\n`;
       if (p.flow) yaml += `    flow: ${p.flow}\n`;
@@ -372,7 +432,7 @@ function serveHtmlPage(res) {
       if (!groups[subtitle]) {
         groups[subtitle] = [];
       }
-      groups[subtitle].push({ link, name: parsed.name });
+      groups[subtitle].push({ link, name: parsed.name, protocol: parsed.protocol, wgConf: parsed.wgConf });
     }
 
     const feedback = loadFeedback();
@@ -386,6 +446,31 @@ function serveHtmlPage(res) {
       let rowsHtml = '';
       for (const node of nodes) {
         const fb = feedback[node.name] || { up: 0, down: 0 };
+        const isWg = node.protocol === 'wireguard';
+        
+        let actionButtons = '';
+        if (isWg && node.wgConf) {
+          const escapedConf = encodeURIComponent(node.wgConf);
+          actionButtons = `
+            <div style="display:inline-flex; gap:0.4rem; align-items:center;">
+              <button class="copy-btn" title="Copy WireGuard .conf" onclick="copyToClipboard(this, decodeURIComponent('${escapedConf}'))" style="padding:0.35rem 0.65rem; font-size:0.75rem; gap:0.3rem;">
+                <span class="material-symbols-outlined" style="font-size:16px;">description</span>
+                <span>.conf</span>
+              </button>
+              <a class="copy-btn" title="Download WireGuard .conf" href="data:text/plain;charset=utf-8,${escapedConf}" download="${encodeURIComponent(node.name)}.conf" style="text-decoration:none; padding:0.35rem 0.5rem; display:inline-flex; align-items:center;">
+                <span class="material-symbols-outlined" style="font-size:16px;">download</span>
+              </a>
+              <button class="copy-btn" title="Copy wireguard:// URL" onclick="copyToClipboard(this, \`${node.link}\`)" style="padding:0.35rem 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size:16px;">link</span>
+              </button>
+            </div>`;
+        } else {
+          actionButtons = `
+            <button class="copy-btn" onclick="copyToClipboard(this, \`${node.link}\`)">
+              <span class="material-symbols-outlined">content_copy</span>
+            </button>`;
+        }
+
         rowsHtml += `
           <tr data-name="${node.name}" data-score="${fb.up - fb.down}">
             <td>
@@ -406,9 +491,7 @@ function serveHtmlPage(res) {
               </div>
             </td>
             <td class="action-cell">
-              <button class="copy-btn" onclick="copyToClipboard(this, \`${node.link}\`)">
-                <span class="material-symbols-outlined">content_copy</span>
-              </button>
+              ${actionButtons}
             </td>
           </tr>`;
       }
@@ -519,6 +602,18 @@ const server = http.createServer((req, res) => {
           network: parsed.type,
           grpcServiceName: parsed.serviceName
         });
+      } else if (parsed.protocol === "wireguard") {
+        clashProxies.push({
+          protocol: "wireguard",
+          name: parsed.name,
+          server: parsed.host,
+          port: parsed.port,
+          ip: parsed.address.split("/")[0],
+          publicKey: parsed.publicKey,
+          privateKey: parsed.privateKey,
+          dns: parsed.dns.split(",").map(d => `"${d.trim()}"`).join(", "),
+          mtu: parsed.mtu
+        });
       } else {
         const proxy = {
           protocol: "vless",
@@ -617,6 +712,18 @@ const server = http.createServer((req, res) => {
             service_name: parsed.serviceName
           };
         }
+        sbOutbounds.push(outbound);
+      } else if (parsed.protocol === "wireguard") {
+        const outbound = {
+          type: "wireguard",
+          tag: parsed.name,
+          server: parsed.host,
+          server_port: parsed.port,
+          local_address: [parsed.address],
+          private_key: parsed.privateKey,
+          peer_public_key: parsed.publicKey,
+          mtu: parsed.mtu
+        };
         sbOutbounds.push(outbound);
       } else {
         const outbound = {
