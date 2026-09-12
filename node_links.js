@@ -14,6 +14,7 @@ module.exports = [
   "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&sni=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK",
   "vless://266185b0-844a-4d00-af3a-384660196d6f@ilpt2.svgrn.work:2053?fp=chrome&sni=ilpt2.svgrn.work&type=ws&path=%2FzG8sPvQe&host=ilpt2.svgrn.work&security=tls#url0327IL",
 
+  "vless://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@aeza.svgrn.work:443?security=reality&encryption=none&pbk=GnT0D3D34FHXL5FOxurs7fjW-9_vvkuAP3lsROIU4T8&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=aeza2.svgrn.work&sid=f8ccb76bb6eea439#aeza-reality",
   "trojan://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@aeza.svgrn.work:443?type=grpc&security=tls&serviceName=%2F37926%2FUtWbtCyfKb&authority=aeza.svgrn.work&sni=aeza.svgrn.work#%F0%9F%87%B7%F0%9F%87%BA%20aeza-msk-trojan",
   "vless://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@aeza.svgrn.work:443?type=xhttp&encryption=none&path=%2FxqTuWcHfA6&host=aeza.svgrn.work&sni=aeza.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#aeza-msk-xhttp",
 

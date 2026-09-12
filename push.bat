@@ -1,3 +1,4 @@
+node sync_nodes.js
 git add .
 git commit -m "subs.js"
 git push
