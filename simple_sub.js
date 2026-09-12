@@ -169,6 +169,13 @@ rule-providers:
     path: ./ruleset/ru-blocked-ip.yaml
 
 rules:
+  # 0. Telphin VoIP (Force Proxy)
+  - DOMAIN-SUFFIX,telphin.com,AUTO-ROUTE-PROXY
+  - DOMAIN-SUFFIX,telphin.ru,AUTO-ROUTE-PROXY
+  - IP-CIDR,46.229.220.0/22,AUTO-ROUTE-PROXY,no-resolve
+  - IP-CIDR,178.248.232.0/21,AUTO-ROUTE-PROXY,no-resolve
+  - IP-CIDR,213.170.92.0/24,AUTO-ROUTE-PROXY,no-resolve
+
   # 1. Banned apps/sites to proxy
   - GEOSITE,telegram,AUTO-ROUTE-PROXY
   - GEOSITE,youtube,AUTO-ROUTE-PROXY
@@ -236,6 +243,15 @@ function generateSingBoxJson(outbounds) {
       ],
       rules: [
         {
+          domain_suffix: ["telphin.com", "telphin.ru"],
+          ip_cidr: [
+            "46.229.220.0/22",
+            "178.248.232.0/21",
+            "213.170.92.0/24"
+          ],
+          outbound: "AUTO-ROUTE-PROXY"
+        },
+        {
           rule_set: [
             "ru-blocked-geosite",
             "ru-blocked-geoip",
@@ -278,7 +294,7 @@ function getLocationSubtitle(url, name) {
 function getLocationTestUrl(subtitle) {
   if (subtitle.includes("MD, Moldova")) return "https://md.svgrn.work/";
   if (subtitle.includes("LV, Latvia")) return "https://veesp.svgrn.work/";
-  if (subtitle.includes("IL, Israel")) return "https://ilpt2.svgrn.work/";
+  if (subtitle.includes("IL, Israel")) return "https://ilpt2.svgrn.work:2053/";
   if (subtitle.includes("RU, Russia (Selectel)")) return "https://seltel.svgrn.work/";
   if (subtitle.includes("RU, Russia (Timeweb)")) return "https://timeweb.svgrn.work/";
   return "";

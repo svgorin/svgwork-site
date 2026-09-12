@@ -631,6 +631,34 @@
       testRegionsReachability();
     });
 
+    function pingHost(url, timeoutMs = 6000) {
+      return new Promise((resolve, reject) => {
+        const start = performance.now();
+        const img = new Image();
+        let finished = false;
+
+        const timer = setTimeout(() => {
+          if (!finished) {
+            finished = true;
+            img.src = "";
+            reject(new Error("Timeout"));
+          }
+        }, timeoutMs);
+
+        img.onload = img.onerror = () => {
+          if (!finished) {
+            finished = true;
+            clearTimeout(timer);
+            const duration = Math.round(performance.now() - start);
+            resolve(duration);
+          }
+        };
+
+        const separator = url.includes('?') ? '&' : '?';
+        img.src = `${url}${separator}_t=${Date.now()}`;
+      });
+    }
+
     function testRegionsReachability() {
       const cards = document.querySelectorAll('.group-card');
       cards.forEach(async (card) => {
@@ -644,22 +672,11 @@
         indicator.className = 'ping-indicator testing';
         indicator.innerHTML = '<span class="material-symbols-outlined spin" style="font-size: 14px; animation: spin 1.5s linear infinite;">sync</span> Testing...';
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
-
-        const start = performance.now();
         try {
-          await fetch(testUrl, {
-            mode: 'no-cors',
-            cache: 'no-store',
-            signal: controller.signal
-          });
-          clearTimeout(timeoutId);
-          const duration = Math.round(performance.now() - start);
+          const duration = await pingHost(testUrl, 6000);
           indicator.className = 'ping-indicator online';
           indicator.innerHTML = `🟢 ${duration}ms`;
         } catch (err) {
-          clearTimeout(timeoutId);
           indicator.className = 'ping-indicator blocked';
           indicator.innerHTML = '❌ Blocked';
         }
