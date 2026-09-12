@@ -287,6 +287,8 @@ function getLocationSubtitle(url, name) {
     return "🇷🇺 RU, Russia (Selectel)";
   } else if (n.includes("timeweb") || u.includes("timeweb.svgrn.work")) {
     return "🇷🇺 RU, Russia (Timeweb)";
+  } else if (n.includes("aeza") || u.includes("aeza.svgrn.work") || u.includes("aeza2.svgrn.work")) {
+    return "🇷🇺 RU, Russia (Aeza)";
   }
   return "🌐 Connection Node";
 }
@@ -297,6 +299,7 @@ function getLocationTestUrl(subtitle) {
   if (subtitle.includes("IL, Israel")) return "https://ilpt2.svgrn.work:2053/";
   if (subtitle.includes("RU, Russia (Selectel)")) return "https://seltel.svgrn.work/";
   if (subtitle.includes("RU, Russia (Timeweb)")) return "https://timeweb.svgrn.work/";
+  if (subtitle.includes("RU, Russia (Aeza)")) return "https://aeza.svgrn.work/";
   return "";
 }
 
