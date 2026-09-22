@@ -1,4 +1,6 @@
 const http = require('http');
+const https = require('https');
+const dns = require('dns');
 const fs = require('fs');
 const path = require('path');
 
@@ -333,34 +335,132 @@ function generateSingBoxJson(outbounds) {
   return JSON.stringify(config, null, 2);
 }
 
-function getLocationSubtitle(url, name) {
-  const u = url.toLowerCase();
-  const n = name.toLowerCase();
-  
-  if (n.includes("md") || u.includes("md.svgrn.work") || u.includes("md-2.svgrn.work")) {
-    return "🇲🇩 MD, Moldova";
-  } else if (n.includes("lv") || u.includes("veesp.svgrn.work") || u.includes("veesp-2.svgrn.work")) {
-    return "🇱🇻 LV, Latvia";
-  } else if (n.includes("il") || u.includes("ilpt2.svgrn.work") || u.includes("saltydyar.click")) {
-    return "🇮🇱 IL, Israel";
-  } else if (n.includes("seltel") || u.includes("seltel.svgrn.work")) {
-    return "🇷🇺 RU, Russia (Selectel)";
-  } else if (n.includes("timeweb") || u.includes("timeweb.svgrn.work")) {
-    return "🇷🇺 RU, Russia (Timeweb)";
-  } else if (n.includes("aeza") || u.includes("aeza.svgrn.work") || u.includes("aeza2.svgrn.work")) {
-    return "🇷🇺 RU, Russia (Aeza)";
+// -----------------------------------------------------------------------------
+// Dynamic Geolocation Engine (ipinfo.io with persistent & in-memory cache)
+// -----------------------------------------------------------------------------
+const GEO_CACHE_FILE = path.join(__dirname, 'geo_cache.json');
+let geoCache = {};
+
+try {
+  if (fs.existsSync(GEO_CACHE_FILE)) {
+    geoCache = JSON.parse(fs.readFileSync(GEO_CACHE_FILE, 'utf8'));
   }
-  return "🌐 Connection Node";
+} catch (e) {
+  console.error("Error loading geo cache:", e);
 }
 
-function getLocationTestUrl(subtitle) {
-  if (subtitle.includes("MD, Moldova")) return "https://md.svgrn.work/";
-  if (subtitle.includes("LV, Latvia")) return "https://veesp.svgrn.work/";
-  if (subtitle.includes("IL, Israel")) return "https://ilpt2.svgrn.work:2053/";
-  if (subtitle.includes("RU, Russia (Selectel)")) return "https://seltel.svgrn.work/";
-  if (subtitle.includes("RU, Russia (Timeweb)")) return "https://timeweb.svgrn.work/";
-  if (subtitle.includes("RU, Russia (Aeza)")) return "https://aeza.svgrn.work/";
-  return "";
+function saveGeoCache() {
+  try {
+    fs.writeFileSync(GEO_CACHE_FILE, JSON.stringify(geoCache, null, 2), 'utf8');
+  } catch (e) {
+    console.error("Error saving geo cache:", e);
+  }
+}
+
+const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+
+function flagEmoji(countryCode) {
+  try {
+    return String.fromCodePoint(...[...countryCode.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+  } catch (e) {
+    return '🌐';
+  }
+}
+
+function extractProviderName(org) {
+  if (!org) return '';
+  if (/veesp/i.test(org)) return 'Veesp';
+  if (/selectel/i.test(org)) return 'Selectel';
+  if (/timeweb/i.test(org)) return 'Timeweb';
+  if (/aeza/i.test(org)) return 'Aeza';
+  if (/alexhost/i.test(org)) return 'AlexHost';
+  return org.replace(/^AS\d+\s+/, '').split(' ')[0].replace(/,/g, '');
+}
+
+function extractHostFromLink(link) {
+  try {
+    if (link.startsWith('wireguard://')) {
+      const withoutScheme = link.substring('wireguard://'.length).split('#')[0];
+      const atIdx = withoutScheme.indexOf('@');
+      if (atIdx !== -1) {
+        const hostPort = withoutScheme.substring(atIdx + 1).split('?')[0];
+        return hostPort.split(':')[0];
+      }
+    }
+    const url = new URL(link);
+    return url.hostname;
+  } catch (e) {
+    const m = link.match(/@([^:/?#]+)/);
+    return m ? m[1] : '';
+  }
+}
+
+function fetchIpInfoJson(ip) {
+  return new Promise((resolve) => {
+    https.get(`https://ipinfo.io/${ip}/json`, { headers: { 'User-Agent': 'curl/8.0' } }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    }).on('error', () => resolve(null));
+  });
+}
+
+async function resolveNodeGeo(link) {
+  const host = extractHostFromLink(link);
+  if (!host) {
+    return { subtitle: '🌐 Other Nodes', testUrl: '' };
+  }
+
+  if (geoCache[host]) {
+    return geoCache[host];
+  }
+
+  let ip = host;
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(host)) {
+    try {
+      const res = await dns.promises.lookup(host);
+      ip = res.address;
+    } catch (e) {
+      console.warn(`[GeoResolver] DNS lookup failed for ${host}:`, e.message);
+    }
+  }
+
+  const info = await fetchIpInfoJson(ip);
+  if (info && info.country) {
+    const countryCode = info.country.toUpperCase();
+    const countryName = displayNames.of(countryCode) || countryCode;
+    const fl = flagEmoji(countryCode);
+    const provider = extractProviderName(info.org);
+    const subtitle = provider ? `${fl} ${countryCode}, ${countryName} (${provider})` : `${fl} ${countryCode}, ${countryName}`;
+    const testUrl = `https://${host}/`;
+
+    geoCache[host] = { ip, countryCode, countryName, flag: fl, provider, subtitle, testUrl };
+    saveGeoCache();
+    return geoCache[host];
+  }
+
+  return { subtitle: `🌐 ${host}`, testUrl: `https://${host}/` };
+}
+
+function getNodeGeoSync(link) {
+  const host = extractHostFromLink(link);
+  if (host && geoCache[host]) {
+    return geoCache[host];
+  }
+  return { subtitle: '🌐 Connection Node', testUrl: host ? `https://${host}/` : '' };
+}
+
+async function prewarmGeoCache(links) {
+  console.log('[GeoResolver] Prewarming IP geolocation cache from ipinfo.io...');
+  const promises = links.map(link => resolveNodeGeo(link));
+  await Promise.allSettled(promises);
+  console.log(`[GeoResolver] Cache ready with ${Object.keys(geoCache).length} endpoints.`);
 }
 
 const DB_FILE = path.join(__dirname, 'feedback.json');
@@ -422,26 +522,27 @@ function serveHtmlPage(res) {
       return;
     }
 
-    // Group links by location
+    // Group links by location dynamically resolved via ipinfo.io
     const groups = {};
     for (const link of nodeLinks) {
       const parsed = parseNode(link);
       if (!parsed) continue;
 
-      const subtitle = getLocationSubtitle(link, parsed.name);
+      const geo = getNodeGeoSync(link);
+      const subtitle = geo.subtitle;
       if (!groups[subtitle]) {
-        groups[subtitle] = [];
+        groups[subtitle] = { testUrl: geo.testUrl, nodes: [] };
       }
-      groups[subtitle].push({ link, name: parsed.name, protocol: parsed.protocol, wgConf: parsed.wgConf });
+      groups[subtitle].nodes.push({ link, name: parsed.name, protocol: parsed.protocol, wgConf: parsed.wgConf });
     }
 
     const feedback = loadFeedback();
 
     // Build the collapsible group cards HTML
     let groupsHtml = '';
-    for (const [location, nodes] of Object.entries(groups)) {
+    for (const [location, groupData] of Object.entries(groups)) {
+      const { testUrl, nodes } = groupData;
       const countText = `${nodes.length} node${nodes.length > 1 ? 's' : ''}`;
-      const testUrl = getLocationTestUrl(location);
       
       let rowsHtml = '';
       for (const node of nodes) {
@@ -809,4 +910,5 @@ const HOST = '0.0.0.0';
 server.listen(PORT, HOST, () => {
   console.log(`Standalone Node server running at http://localhost:${PORT}`);
   console.log(`Test subscription: http://localhost:${PORT}/sub?key=${SECRET_KEY}`);
+  prewarmGeoCache(nodeLinks);
 });

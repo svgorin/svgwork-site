@@ -15,7 +15,7 @@ export async function onRequest(context) {
     });
   }
 
-      // 2. Define your node URLs (one per line)
+            // 2. Define your node URLs (one per line)
   const nodeLinks = [
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Y_YpgteBD1JQJBjtrESolnk8mbrVaY4mb6nuXi2ztSU&sni=veesp-2.svgrn.work&sid=de8b8bafaa0b4acb#LV0808reality",
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?type=ws&security=tls&path=%2F13117%2F8eJYdnO212&host=veesp.svgrn.work&sni=veesp.svgrn.work&encryption=none#LV0808ws",
@@ -34,7 +34,12 @@ export async function onRequest(context) {
     "trojan://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@aeza.svgrn.work:443?type=grpc&security=tls&serviceName=%2F37926%2FUtWbtCyfKb&authority=aeza.svgrn.work&sni=aeza.svgrn.work#%F0%9F%87%B7%F0%9F%87%BA%20aeza-msk-trojan",
     "vless://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@aeza.svgrn.work:443?type=xhttp&encryption=none&path=%2FxqTuWcHfA6&host=aeza.svgrn.work&sni=aeza.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#aeza-msk-xhttp",
     "wireguard://aMCrsVcZEmPqD2/d8hDlDcc8hZR1ww+owO2qPYOXX2k=@timeweb.svgrn.work:42720?address=10.0.0.2%2F32&publickey=xyMgj%2BaHp1HH6NnFQaCLF0OcQ60fJGEXpW7JRly%2F8Vo%3D&dns=1.1.1.1%2C+1.0.0.1&mtu=1420#%F0%9F%87%B7%F0%9F%87%BA%20timeweb-wg",
-    "wireguard://aMCrsVcZEmPqD2/d8hDlDcc8hZR1ww+owO2qPYOXX2k=@aeza.svgrn.work:42720?address=10.0.0.2%2F32&publickey=xyMgj%2BaHp1HH6NnFQaCLF0OcQ60fJGEXpW7JRly%2F8Vo%3D&dns=1.1.1.1%2C+1.0.0.1&mtu=1420#%F0%9F%87%B7%F0%9F%87%BA%20aeza-wg"
+    "wireguard://aMCrsVcZEmPqD2/d8hDlDcc8hZR1ww+owO2qPYOXX2k=@aeza.svgrn.work:42720?address=10.0.0.2%2F32&publickey=xyMgj%2BaHp1HH6NnFQaCLF0OcQ60fJGEXpW7JRly%2F8Vo%3D&dns=1.1.1.1%2C+1.0.0.1&mtu=1420#%F0%9F%87%B7%F0%9F%87%BA%20aeza-wg",
+    "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=mzgQXN0xlCYDwc8QOOWCFlz4q8fZpe1viz8zgoboakE&sni=veespse2.svgrn.work&sid=7ac6408b9f51292c#SE0922reality",
+    "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=ws&security=tls&path=%2F12733%2FKiM8nbrWcB&host=veespse.svgrn.work&sni=veespse.svgrn.work&encryption=none#SE0922ws",
+    "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=xhttp&encryption=none&path=%2FKkd0SCMpvP&host=veespse.svgrn.work&sni=veespse.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#SE0922xhttp",
+    "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=grpc&security=tls&serviceName=%2F25570%2FocUOBPBa59&authority=veespse.svgrn.work&sni=veespse.svgrn.work#SE0922trojan",
+    "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?sni=veespse.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#SE0922hy2"
 ];
 
   const userAgent = (request.headers.get("User-Agent") || "").toLowerCase();
