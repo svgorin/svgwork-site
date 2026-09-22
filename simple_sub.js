@@ -437,7 +437,7 @@ async function resolveNodeGeo(link) {
     const countryName = displayNames.of(countryCode) || countryCode;
     const fl = flagEmoji(countryCode);
     const provider = extractProviderName(info.org);
-    const subtitle = provider ? `${fl} ${countryCode}, ${countryName} (${provider})` : `${fl} ${countryCode}, ${countryName}`;
+    const subtitle = `${fl} ${countryCode}, ${countryName}`;
     const testUrl = `https://${host}/`;
 
     geoCache[host] = { ip, countryCode, countryName, flag: fl, provider, subtitle, testUrl };

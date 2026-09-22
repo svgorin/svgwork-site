@@ -5,7 +5,7 @@
     "countryName": "Latvia",
     "flag": "🇱🇻",
     "provider": "Veesp",
-    "subtitle": "🇱🇻 LV, Latvia (Veesp)",
+    "subtitle": "🇱🇻 LV, Latvia",
     "testUrl": "https://veesp-2.svgrn.work/"
   },
   "veesp.svgrn.work": {
@@ -14,7 +14,7 @@
     "countryName": "Latvia",
     "flag": "🇱🇻",
     "provider": "Veesp",
-    "subtitle": "🇱🇻 LV, Latvia (Veesp)",
+    "subtitle": "🇱🇻 LV, Latvia",
     "testUrl": "https://veesp.svgrn.work/"
   },
   "md-2.svgrn.work": {
@@ -23,7 +23,7 @@
     "countryName": "Moldova",
     "flag": "🇲🇩",
     "provider": "AlexHost",
-    "subtitle": "🇲🇩 MD, Moldova (AlexHost)",
+    "subtitle": "🇲🇩 MD, Moldova",
     "testUrl": "https://md-2.svgrn.work/"
   },
   "md.svgrn.work": {
@@ -32,7 +32,7 @@
     "countryName": "Moldova",
     "flag": "🇲🇩",
     "provider": "AlexHost",
-    "subtitle": "🇲🇩 MD, Moldova (AlexHost)",
+    "subtitle": "🇲🇩 MD, Moldova",
     "testUrl": "https://md.svgrn.work/"
   },
   "seltel.svgrn.work": {
@@ -41,7 +41,7 @@
     "countryName": "Russia",
     "flag": "🇷🇺",
     "provider": "Selectel",
-    "subtitle": "🇷🇺 RU, Russia (Selectel)",
+    "subtitle": "🇷🇺 RU, Russia",
     "testUrl": "https://seltel.svgrn.work/"
   },
   "timeweb2.svgrn.work": {
@@ -50,7 +50,7 @@
     "countryName": "Russia",
     "flag": "🇷🇺",
     "provider": "Timeweb",
-    "subtitle": "🇷🇺 RU, Russia (Timeweb)",
+    "subtitle": "🇷🇺 RU, Russia",
     "testUrl": "https://timeweb2.svgrn.work/"
   },
   "timeweb.svgrn.work": {
@@ -59,7 +59,7 @@
     "countryName": "Russia",
     "flag": "🇷🇺",
     "provider": "Timeweb",
-    "subtitle": "🇷🇺 RU, Russia (Timeweb)",
+    "subtitle": "🇷🇺 RU, Russia",
     "testUrl": "https://timeweb.svgrn.work/"
   },
   "ilpt2.svgrn.work": {
@@ -68,7 +68,7 @@
     "countryName": "Israel",
     "flag": "🇮🇱",
     "provider": "O.M.C.",
-    "subtitle": "🇮🇱 IL, Israel (O.M.C.)",
+    "subtitle": "🇮🇱 IL, Israel",
     "testUrl": "https://ilpt2.svgrn.work/"
   },
   "aeza.svgrn.work": {
@@ -77,7 +77,7 @@
     "countryName": "Russia",
     "flag": "🇷🇺",
     "provider": "Aeza",
-    "subtitle": "🇷🇺 RU, Russia (Aeza)",
+    "subtitle": "🇷🇺 RU, Russia",
     "testUrl": "https://aeza.svgrn.work/"
   },
   "veespse2.svgrn.work": {
@@ -86,7 +86,7 @@
     "countryName": "Sweden",
     "flag": "🇸🇪",
     "provider": "Veesp",
-    "subtitle": "🇸🇪 SE, Sweden (Veesp)",
+    "subtitle": "🇸🇪 SE, Sweden",
     "testUrl": "https://veespse2.svgrn.work/"
   },
   "veespse.svgrn.work": {
@@ -95,7 +95,7 @@
     "countryName": "Sweden",
     "flag": "🇸🇪",
     "provider": "Veesp",
-    "subtitle": "🇸🇪 SE, Sweden (Veesp)",
+    "subtitle": "🇸🇪 SE, Sweden",
     "testUrl": "https://veespse.svgrn.work/"
   },
   "13.140.10.230": {
@@ -104,7 +104,7 @@
     "countryName": "Sweden",
     "flag": "🇸🇪",
     "provider": "Veesp",
-    "subtitle": "🇸🇪 SE, Sweden (Veesp)",
+    "subtitle": "🇸🇪 SE, Sweden",
     "testUrl": "https://13.140.10.230/"
   },
   "is1984.svgrn.work": {
@@ -113,7 +113,7 @@
     "countryName": "Iceland",
     "flag": "🇮🇸",
     "provider": "1984",
-    "subtitle": "🇮🇸 IS, Iceland (1984)",
+    "subtitle": "🇮🇸 IS, Iceland",
     "testUrl": "https://is1984.svgrn.work/"
   },
   "is1984-2.svgrn.work": {
@@ -122,7 +122,7 @@
     "countryName": "Iceland",
     "flag": "🇮🇸",
     "provider": "1984",
-    "subtitle": "🇮🇸 IS, Iceland (1984)",
+    "subtitle": "🇮🇸 IS, Iceland",
     "testUrl": "https://is1984-2.svgrn.work/"
   },
   "89.126.249.223": {
@@ -131,7 +131,7 @@
     "countryName": "Iceland",
     "flag": "🇮🇸",
     "provider": "1984",
-    "subtitle": "🇮🇸 IS, Iceland (1984)",
+    "subtitle": "🇮🇸 IS, Iceland",
     "testUrl": "https://89.126.249.223/"
   }
 }
