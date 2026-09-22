@@ -106,5 +106,32 @@
     "provider": "Veesp",
     "subtitle": "🇸🇪 SE, Sweden (Veesp)",
     "testUrl": "https://13.140.10.230/"
+  },
+  "is1984.svgrn.work": {
+    "ip": "89.126.249.223",
+    "countryCode": "IS",
+    "countryName": "Iceland",
+    "flag": "🇮🇸",
+    "provider": "1984",
+    "subtitle": "🇮🇸 IS, Iceland (1984)",
+    "testUrl": "https://is1984.svgrn.work/"
+  },
+  "is1984-2.svgrn.work": {
+    "ip": "89.126.249.223",
+    "countryCode": "IS",
+    "countryName": "Iceland",
+    "flag": "🇮🇸",
+    "provider": "1984",
+    "subtitle": "🇮🇸 IS, Iceland (1984)",
+    "testUrl": "https://is1984-2.svgrn.work/"
+  },
+  "89.126.249.223": {
+    "ip": "89.126.249.223",
+    "countryCode": "IS",
+    "countryName": "Iceland",
+    "flag": "🇮🇸",
+    "provider": "1984",
+    "subtitle": "🇮🇸 IS, Iceland (1984)",
+    "testUrl": "https://89.126.249.223/"
   }
 }

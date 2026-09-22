@@ -24,6 +24,12 @@ module.exports = [
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=mzgQXN0xlCYDwc8QOOWCFlz4q8fZpe1viz8zgoboakE&sni=veespse2.svgrn.work&sid=7ac6408b9f51292c#SE0922reality",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=ws&security=tls&path=%2F12733%2FKiM8nbrWcB&host=veespse.svgrn.work&sni=veespse.svgrn.work&encryption=none#SE0922ws",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=xhttp&encryption=none&path=%2FKkd0SCMpvP&host=veespse.svgrn.work&sni=veespse.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#SE0922xhttp",
+  "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?sni=veespse.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#SE0922hy2",
   "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=grpc&security=tls&serviceName=%2F25570%2FocUOBPBa59&authority=veespse.svgrn.work&sni=veespse.svgrn.work#SE0922trojan",
-  "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?sni=veespse.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#SE0922hy2"
+
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=cPYXCpebGrg2dgM60IXisBUfb_7p6JFdlZ0FJwDohUw&sni=is1984-2.svgrn.work&sid=428cdb76ec51db09#IS0922reality",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984.svgrn.work:443?type=ws&security=tls&path=%2F56772%2FxrpepGo43l&host=is1984.svgrn.work&sni=is1984.svgrn.work&encryption=none#IS0922ws",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984.svgrn.work:443?type=xhttp&encryption=none&path=%2FT3LyARVh8q&host=is1984.svgrn.work&sni=is1984.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#IS0922xhttp",
+  "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984.svgrn.work:443?type=grpc&security=tls&serviceName=%2F14031%2Fg4hcnIVJUH&authority=is1984.svgrn.work&sni=is1984.svgrn.work#IS0922trojan",
+  "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984.svgrn.work:443?sni=is1984.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#IS0922hy2"
 ];
