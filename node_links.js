@@ -21,13 +21,13 @@ module.exports = [
   "wireguard://aMCrsVcZEmPqD2/d8hDlDcc8hZR1ww+owO2qPYOXX2k=@timeweb.svgrn.work:42720?address=10.0.0.2%2F32&publickey=xyMgj%2BaHp1HH6NnFQaCLF0OcQ60fJGEXpW7JRly%2F8Vo%3D&dns=1.1.1.1%2C+1.0.0.1&mtu=1420#%F0%9F%87%B7%F0%9F%87%BA%20timeweb-wg",
   "wireguard://aMCrsVcZEmPqD2/d8hDlDcc8hZR1ww+owO2qPYOXX2k=@aeza.svgrn.work:42720?address=10.0.0.2%2F32&publickey=xyMgj%2BaHp1HH6NnFQaCLF0OcQ60fJGEXpW7JRly%2F8Vo%3D&dns=1.1.1.1%2C+1.0.0.1&mtu=1420#%F0%9F%87%B7%F0%9F%87%BA%20aeza-wg",
 
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=mzgQXN0xlCYDwc8QOOWCFlz4q8fZpe1viz8zgoboakE&sni=veespse2.svgrn.work&sid=7ac6408b9f51292c#SE0922reality",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@13.140.10.230:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=mzgQXN0xlCYDwc8QOOWCFlz4q8fZpe1viz8zgoboakE&sni=swdist.apple.com&sid=7ac6408b9f51292c#SE0922reality",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=ws&security=tls&path=%2F12733%2FKiM8nbrWcB&host=veespse.svgrn.work&sni=veespse.svgrn.work&encryption=none#SE0922ws",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=xhttp&encryption=none&path=%2FKkd0SCMpvP&host=veespse.svgrn.work&sni=veespse.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#SE0922xhttp",
   "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?sni=veespse.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#SE0922hy2",
   "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@veespse.svgrn.work:443?type=grpc&security=tls&serviceName=%2F25570%2FocUOBPBa59&authority=veespse.svgrn.work&sni=veespse.svgrn.work#SE0922trojan",
 
-  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=cPYXCpebGrg2dgM60IXisBUfb_7p6JFdlZ0FJwDohUw&sni=is1984-2.svgrn.work&sid=428cdb76ec51db09#IS0922reality",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=cPYXCpebGrg2dgM60IXisBUfb_7p6JFdlZ0FJwDohUw&sni=swdist.apple.com&sid=428cdb76ec51db09#IS0922reality",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984.svgrn.work:443?type=ws&security=tls&path=%2F56772%2FxrpepGo43l&host=is1984.svgrn.work&sni=is1984.svgrn.work&encryption=none#IS0922ws",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984.svgrn.work:443?type=xhttp&encryption=none&path=%2FT3LyARVh8q&host=is1984.svgrn.work&sni=is1984.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#IS0922xhttp",
   "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@is1984.svgrn.work:443?type=grpc&security=tls&serviceName=%2F14031%2Fg4hcnIVJUH&authority=is1984.svgrn.work&sni=is1984.svgrn.work#IS0922trojan",
