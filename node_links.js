@@ -1,6 +1,7 @@
 module.exports = [
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Y_YpgteBD1JQJBjtrESolnk8mbrVaY4mb6nuXi2ztSU&sni=veesp-2.svgrn.work&sid=de8b8bafaa0b4acb#LV0808reality",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?type=ws&security=tls&path=%2F13117%2F8eJYdnO212&host=veesp.svgrn.work&sni=veesp.svgrn.work&encryption=none#LV0808ws",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?type=xhttp&encryption=none&path=%2FZGjU05ksuO&host=veesp.svgrn.work&sni=veesp.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#LV0808xhttp",
   "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?type=grpc&security=tls&serviceName=%2F36395%2FD86ifozy18&authority=veesp.svgrn.work&sni=veesp.svgrn.work#LV0808trojan",
   "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?sni=veesp.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#LV0808hy2",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Pf-AYuI9dT31I7ZlI5NVJISzTw5ahG-jw-iMxjSsSTk&sni=md-2.svgrn.work&sid=b2e9cd1f5a684703#md0708reality",
