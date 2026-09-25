@@ -15,7 +15,7 @@ export async function onRequest(context) {
     });
   }
 
-                          // 2. Define your node URLs (one per line)
+                            // 2. Define your node URLs (one per line)
   const nodeLinks = [
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp-2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=Y_YpgteBD1JQJBjtrESolnk8mbrVaY4mb6nuXi2ztSU&sni=veesp-2.svgrn.work&sid=de8b8bafaa0b4acb#LV0808reality",
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@veesp.svgrn.work:443?type=ws&security=tls&path=%2F13117%2F8eJYdnO212&host=veesp.svgrn.work&sni=veesp.svgrn.work&encryption=none#LV0808ws",
@@ -26,7 +26,7 @@ export async function onRequest(context) {
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=ws&security=tls&path=%2F46469%2FUKxNbRsRyJ&host=md.svgrn.work&sni=md.svgrn.work&encryption=none#md0708ws",
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=xhttp&encryption=none&path=%2FVEQodnEXkv&host=md.svgrn.work&sni=md.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#md0708xhttp",
     "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@md.svgrn.work:443?type=grpc&security=tls&serviceName=%2F22899%2Fo0GdKCj7h3&authority=md.svgrn.work&sni=md.svgrn.work#md0708trojan",
-    "vless://57825bae-1d76-4be6-81ac-944734401557@seltel.svgrn.work:51732?encryption=none&type=tcp&security=reality&fp=chrome&sni=dl.google.com&pbk=_n5BSv-BFgNNg2Qku6Fy9Imn2ekOYVqllyQAUu7KHWw&sid=809ee562267e7965#SELTEL-REALITY",
+    "vless://57825bae-1d76-4be6-81ac-944734401557@seltel.svgrn.work:51732?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=dl.google.com&pbk=_n5BSv-BFgNNg2Qku6Fy9Imn2ekOYVqllyQAUu7KHWw&sid=809ee562267e7965#SELTEL-REALITY",
     "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@seltel.svgrn.work:9443?encryption=none&type=tcp&security=tls&flow=xtls-rprx-vision&sni=seltel.svgrn.work#seltel9443",
     "vless://a4f61ab4-6b7d-423e-8af7-bb2423be783b@timeweb2.svgrn.work:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=6N6BHYvPT9FgWrW74DexzmqJoN_-CpsUQlJW97hL3xI&sni=timeweb2.svgrn.work&sid=d2653f6888fbc20d#Timeweb-Reality",
     "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@timeweb.svgrn.work:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&sni=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK",
