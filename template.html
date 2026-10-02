@@ -195,37 +195,45 @@
       flex-wrap: wrap;
     }
 
-    .filter-btn {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 20px;
-      padding: 0.4rem 1rem;
-      color: var(--text-muted);
-      cursor: pointer;
+    .filter-checkbox-label {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 0.4rem 1rem;
       font-size: 0.85rem;
-      font-family: inherit;
       font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      user-select: none;
       transition: all 0.2s ease;
     }
 
-    .filter-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
-      border-color: rgba(255, 255, 255, 0.1);
+    .filter-checkbox-label:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
-    .filter-btn.active {
-      background: rgba(16, 185, 129, 0.15);
-      border-color: #10b981;
+    .filter-checkbox-label input[type="checkbox"] {
+      accent-color: #10b981;
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .probe-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 500;
       color: #34d399;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
-    }
-
-    .filter-btn .material-symbols-outlined {
-      font-size: 16px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
     }
 
     /* Collapsible Group Cards */
@@ -386,48 +394,56 @@
       gap: 0.75rem;
     }
 
-    .vote-container {
-      display: inline-flex;
-      gap: 0.4rem;
-      align-items: center;
-    }
-
-    .vote-btn {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 6px;
-      padding: 0.15rem 0.45rem;
-      color: var(--text-muted);
-      cursor: pointer;
+    .probe-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.25rem;
-      font-size: 0.8rem;
-      font-family: inherit;
+      gap: 0.35rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
       font-weight: 600;
-      transition: all 0.2s ease;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      vertical-align: middle;
     }
 
-    .vote-btn:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-main);
+    .probe-badge.pass {
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
     }
 
-    .vote-btn.vote-up:hover {
-      border-color: rgba(16, 185, 129, 0.4);
-      background: rgba(16, 185, 129, 0.04);
+    .probe-badge.fail {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.25);
     }
 
-    .vote-btn.vote-down:hover {
-      border-color: rgba(239, 68, 68, 0.4);
-      background: rgba(239, 68, 68, 0.04);
+    .probe-badge.unknown {
+      background: rgba(156, 163, 175, 0.08);
+      color: var(--text-muted);
+      border: 1px solid rgba(156, 163, 175, 0.18);
     }
 
+    .probe-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
 
+    .probe-dot.pass {
+      background: #10b981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+    }
 
-    .vote-emoji {
-      font-size: 0.85rem;
-      display: inline-flex;
+    .probe-dot.fail {
+      background: #ef4444;
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+    }
+
+    .probe-dot.unknown {
+      background: #6b7280;
     }
 
     .action-cell {
@@ -557,15 +573,17 @@
     <div class="controls-bar">
       <span class="control-label">Filter & Sort Nodes:</span>
       <div class="controls-group">
-        <button id="filter-good-btn" class="filter-btn" onclick="toggleFilterGood()">
-          <span class="material-symbols-outlined">verified</span> Good Only (>= 2)
-        </button>
+        <label class="filter-checkbox-label">
+          <input type="checkbox" id="working-only-check" onchange="applyFilters()">
+          <span>Working only</span>
+        </label>
         <button id="sort-name-btn" class="sort-btn active" onclick="sortTables('name')">
           <span class="material-symbols-outlined">sort_by_alpha</span> By Name
         </button>
-        <button id="sort-votes-btn" class="sort-btn" onclick="sortTables('votes')">
-          <span class="material-symbols-outlined">trending_up</span> By Net Score
+        <button id="sort-status-btn" class="sort-btn" onclick="sortTables('status')">
+          <span class="material-symbols-outlined">verified</span> Working First
         </button>
+        <!-- PROBE_META_PLACEHOLDER -->
       </div>
     </div>
 
@@ -581,8 +599,8 @@
         <li><strong style="color: var(--text-main);">Option 2:</strong> Click the copy button next to an individual node to copy its single URL, then choose "Import config from clipboard" in your app.</li>
       </ul>
 
-      <h3 style="margin-top: 1.25rem;"><span class="material-symbols-outlined">rate_review</span> Connection Feedback</h3>
-      <p>Click the ✅ button next to a server to indicate that it works for you, or ❌ if it doesn't. Counters update in real-time to help everyone choose the best-performing connection.</p>
+      <h3 style="margin-top: 1.25rem;"><span class="material-symbols-outlined">sensors</span> Russian TSPU Live Probing</h3>
+      <p>Node availability and latency are automatically verified once per hour from inside Russia (Moscow TSPU) by an active probe measuring live connectivity to Google 204 endpoints.</p>
     </div>
   </div>
 
@@ -593,22 +611,15 @@
 
   <script>
     let currentSortMode = 'name';
-    let filterGoodActive = false;
-
-    function toggleFilterGood() {
-      filterGoodActive = !filterGoodActive;
-      const filterBtn = document.getElementById('filter-good-btn');
-      if (filterBtn) filterBtn.classList.toggle('active', filterGoodActive);
-      applyFilters();
-    }
 
     function applyFilters() {
+      const workingOnly = document.getElementById('working-only-check')?.checked;
       const rows = document.querySelectorAll('#node-groups tbody tr');
       rows.forEach(row => {
-        const score = parseInt(row.getAttribute('data-score')) || 0;
+        const status = row.getAttribute('data-status');
         let show = true;
-        if (filterGoodActive && score < 2) {
-          show = false;
+        if (workingOnly) {
+          show = (status === 'PASS');
         }
         row.style.display = show ? '' : 'none';
       });
@@ -708,9 +719,9 @@
       currentSortMode = mode;
       
       const nameBtn = document.getElementById('sort-name-btn');
-      const votesBtn = document.getElementById('sort-votes-btn');
+      const statusBtn = document.getElementById('sort-status-btn');
       if (nameBtn) nameBtn.classList.toggle('active', mode === 'name');
-      if (votesBtn) votesBtn.classList.toggle('active', mode === 'votes');
+      if (statusBtn) statusBtn.classList.toggle('active', mode === 'status');
 
       const tables = document.querySelectorAll('#node-groups table');
       tables.forEach(table => {
@@ -721,12 +732,17 @@
           const nameA = a.getAttribute('data-name') || '';
           const nameB = b.getAttribute('data-name') || '';
           
-          const scoreA = parseInt(a.getAttribute('data-score')) || 0;
-          const scoreB = parseInt(b.getAttribute('data-score')) || 0;
-
-          if (mode === 'votes') {
-            if (scoreB !== scoreA) {
-              return scoreB - scoreA;
+          if (mode === 'status') {
+            const statusOrder = { 'PASS': 0, 'UNKNOWN': 1, 'FAIL': 2 };
+            const statA = statusOrder[a.getAttribute('data-status')] ?? 1;
+            const statB = statusOrder[b.getAttribute('data-status')] ?? 1;
+            if (statA !== statB) {
+              return statA - statB;
+            }
+            const latA = parseInt(a.getAttribute('data-latency')) || 9999;
+            const latB = parseInt(b.getAttribute('data-latency')) || 9999;
+            if (latA !== latB) {
+              return latA - latB;
             }
             return nameA.localeCompare(nameB);
           } else {
@@ -736,32 +752,6 @@
 
         rows.forEach(row => tbody.appendChild(row));
       });
-    }
-
-    function vote(nodeName, type) {
-      const secretKey = window.location.pathname.split('/').filter(Boolean).pop();
-      fetch(`/${secretKey}/vote?node=${encodeURIComponent(nodeName)}&type=${type}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            document.getElementById(`count-up-${nodeName}`).textContent = data.up;
-            document.getElementById(`count-down-${nodeName}`).textContent = data.down;
-
-            const row = document.getElementById(`count-up-${nodeName}`).closest('tr');
-            if (row) {
-              row.setAttribute('data-score', data.up - data.down);
-            }
-
-            if (currentSortMode === 'votes') {
-              sortTables('votes');
-            }
-
-            applyFilters();
-          }
-        })
-        .catch(err => {
-          console.error('Error submitting vote:', err);
-        });
     }
 
     function toggleGroup(header) {

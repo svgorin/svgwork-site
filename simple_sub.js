@@ -463,54 +463,25 @@ async function prewarmGeoCache(links) {
   console.log(`[GeoResolver] Cache ready with ${Object.keys(geoCache).length} endpoints.`);
 }
 
-const DB_FILE = path.join(__dirname, 'feedback.json');
+const PROBE_FILE = path.join(__dirname, 'probe_results.json');
 
-function loadFeedback() {
+function loadProbeResults() {
   try {
-    if (fs.existsSync(DB_FILE)) {
-      return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    if (fs.existsSync(PROBE_FILE)) {
+      return JSON.parse(fs.readFileSync(PROBE_FILE, 'utf8'));
     }
   } catch (e) {
-    console.error("Error reading feedback DB:", e);
+    console.error("Error reading probe DB:", e);
   }
-  return {};
+  return { updated_at: null, source: null, nodes: {} };
 }
 
-function saveFeedback(data) {
+function saveProbeResults(data) {
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    fs.writeFileSync(PROBE_FILE, JSON.stringify(data, null, 2), 'utf8');
   } catch (e) {
-    console.error("Error writing feedback DB:", e);
+    console.error("Error writing probe DB:", e);
   }
-}
-
-function handleVoteRequest(reqUrl, res) {
-  const node = reqUrl.searchParams.get("node");
-  const type = reqUrl.searchParams.get("type");
-
-  if (!node || (type !== "up" && type !== "down")) {
-    res.writeHead(400, { "content-type": "application/json" });
-    res.end(JSON.stringify({ success: false, error: "Invalid parameters" }));
-    return;
-  }
-
-  const feedback = loadFeedback();
-  if (!feedback[node]) {
-    feedback[node] = { up: 0, down: 0 };
-  }
-
-  feedback[node][type] += 1;
-  saveFeedback(feedback);
-
-  res.writeHead(200, {
-    "content-type": "application/json",
-    "cache-control": "no-store, no-cache, must-revalidate"
-  });
-  res.end(JSON.stringify({
-    success: true,
-    up: feedback[node].up,
-    down: feedback[node].down
-  }));
 }
 
 function serveHtmlPage(res) {
@@ -536,7 +507,8 @@ function serveHtmlPage(res) {
       groups[subtitle].nodes.push({ link, name: parsed.name, protocol: parsed.protocol, wgConf: parsed.wgConf });
     }
 
-    const feedback = loadFeedback();
+    const probeData = loadProbeResults();
+    const probeNodes = probeData.nodes || {};
 
     // Build the collapsible group cards HTML
     let groupsHtml = '';
@@ -546,7 +518,20 @@ function serveHtmlPage(res) {
       
       let rowsHtml = '';
       for (const node of nodes) {
-        const fb = feedback[node.name] || { up: 0, down: 0 };
+        const probe = probeNodes[node.name];
+        const status = probe ? probe.status : 'UNKNOWN';
+        const latency = probe && probe.latency ? `${probe.latency}ms` : '';
+        const detail = probe ? (probe.detail || '') : 'Not tested';
+        
+        let badgeHtml = '';
+        if (status === 'PASS') {
+          badgeHtml = `<span class="probe-badge pass" title="${detail}"><span class="probe-dot pass"></span>PASS ${latency}</span>`;
+        } else if (status === 'FAIL') {
+          badgeHtml = `<span class="probe-badge fail" title="${detail}"><span class="probe-dot fail"></span>BLOCKED</span>`;
+        } else {
+          badgeHtml = `<span class="probe-badge unknown" title="${detail}"><span class="probe-dot unknown"></span>—</span>`;
+        }
+
         const isWg = node.protocol === 'wireguard';
         
         let actionButtons = '';
@@ -573,21 +558,12 @@ function serveHtmlPage(res) {
         }
 
         rowsHtml += `
-          <tr data-name="${node.name}" data-score="${fb.up - fb.down}">
+          <tr data-name="${node.name}" data-status="${status}" data-latency="${probe && probe.latency ? probe.latency : 9999}">
             <td>
               <div class="node-info">
                 <div class="node-name">
-                  ${node.name}
-                  <div class="vote-container" data-node="${node.name}">
-                    <button class="vote-btn vote-up" onclick="vote('${node.name}', 'up')">
-                      <span class="vote-emoji">✅</span>
-                      <span class="vote-count" id="count-up-${node.name}">${fb.up}</span>
-                    </button>
-                    <button class="vote-btn vote-down" onclick="vote('${node.name}', 'down')">
-                      <span class="vote-emoji">❌</span>
-                      <span class="vote-count" id="count-down-${node.name}">${fb.down}</span>
-                    </button>
-                  </div>
+                  <span>${node.name}</span>
+                  ${badgeHtml}
                 </div>
               </div>
             </td>
@@ -623,7 +599,16 @@ function serveHtmlPage(res) {
     </div>`;
     }
 
-    const renderedHtml = html.replace('<!-- GROUPS_PLACEHOLDER -->', groupsHtml);
+    let probeMetaHtml = '';
+    if (probeData.updated_at) {
+      const d = new Date(probeData.updated_at);
+      const timeStr = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' });
+      probeMetaHtml = `<span class="probe-meta"><span class="material-symbols-outlined" style="font-size:16px;">verified</span> Probed from Moscow (${timeStr} MSK)</span>`;
+    }
+
+    let renderedHtml = html.replace('<!-- GROUPS_PLACEHOLDER -->', groupsHtml);
+    renderedHtml = renderedHtml.replace('<!-- PROBE_META_PLACEHOLDER -->', probeMetaHtml);
+
     res.writeHead(200, {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "no-store, no-cache, must-revalidate"
@@ -636,13 +621,46 @@ const server = http.createServer((req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = reqUrl.pathname;
 
-  // 1. Vote API endpoint
-  if (pathname === `/${SECRET_KEY}/vote`) {
-    handleVoteRequest(reqUrl, res);
+  // 1. Probe update API endpoint (POST)
+  if (pathname === `/${SECRET_KEY}/probe-update` && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body);
+        let formatted = payload;
+        if (!payload.nodes && typeof payload === 'object') {
+          formatted = {
+            updated_at: new Date().toISOString(),
+            source: 'aeza (Moscow)',
+            nodes: payload
+          };
+        } else if (!payload.updated_at) {
+          formatted.updated_at = new Date().toISOString();
+        }
+        saveProbeResults(formatted);
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ success: true, count: Object.keys(formatted.nodes || {}).length }));
+      } catch (e) {
+        res.writeHead(400, { "content-type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+    });
     return;
   }
 
-  // 2. HTML page request under the pure key segment
+  // 2. Probe results JSON endpoint (GET)
+  if (pathname === `/${SECRET_KEY}/probe-results.json` || pathname === `/${SECRET_KEY}/probe-results`) {
+    const probeData = loadProbeResults();
+    res.writeHead(200, {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store, no-cache, must-revalidate"
+    });
+    res.end(JSON.stringify(probeData, null, 2));
+    return;
+  }
+
+  // 3. HTML page request under the pure key segment
   if (pathname === `/${SECRET_KEY}`) {
     serveHtmlPage(res);
     return;
