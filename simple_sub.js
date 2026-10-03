@@ -513,9 +513,14 @@ function serveHtmlPage(res) {
     // Build the collapsible group cards HTML
     let groupsHtml = '';
     for (const [location, groupData] of Object.entries(groups)) {
-      const { testUrl, nodes } = groupData;
+      const { nodes } = groupData;
       const countText = `${nodes.length} node${nodes.length > 1 ? 's' : ''}`;
       
+      let passCount = 0;
+      let failCount = 0;
+      let unknownCount = 0;
+      let worstLatency = 0;
+
       let rowsHtml = '';
       for (const node of nodes) {
         const probe = probeNodes[node.name];
@@ -523,6 +528,21 @@ function serveHtmlPage(res) {
         const latency = probe && probe.latency ? `${probe.latency}ms` : '';
         const detail = probe ? (probe.detail || '') : 'Not tested';
         
+        if (probe) {
+          if (probe.status === 'PASS') {
+            passCount++;
+            if (typeof probe.latency === 'number' && probe.latency > worstLatency) {
+              worstLatency = probe.latency;
+            }
+          } else if (probe.status === 'FAIL') {
+            failCount++;
+          } else {
+            unknownCount++;
+          }
+        } else {
+          unknownCount++;
+        }
+
         let badgeHtml = '';
         if (status === 'PASS') {
           badgeHtml = `<span class="probe-badge pass" title="${detail}"><span class="probe-dot pass"></span>PASS ${latency}</span>`;
@@ -573,13 +593,25 @@ function serveHtmlPage(res) {
           </tr>`;
       }
 
+      let countryStatusHtml = '';
+      if (passCount > 0 && failCount === 0) {
+        const pingLabel = nodes.length > 1 ? `${worstLatency}ms (worst)` : `${worstLatency}ms`;
+        countryStatusHtml = `<span class="ping-indicator online" title="All ${passCount} tested configurations operational. Worst latency: ${worstLatency}ms">🟢 Online · ${pingLabel}</span>`;
+      } else if (passCount > 0 && failCount > 0) {
+        countryStatusHtml = `<span class="ping-indicator partial" title="${passCount} of ${passCount + failCount} configurations operational. Worst working latency: ${worstLatency}ms">🟡 Partial (${passCount}/${passCount + failCount}) · ${worstLatency}ms (worst)</span>`;
+      } else if (failCount > 0 && passCount === 0) {
+        countryStatusHtml = `<span class="ping-indicator blocked" title="All ${failCount} tested configurations blocked by Russian TSPU">❌ Blocked</span>`;
+      } else {
+        countryStatusHtml = `<span class="ping-indicator unknown" title="Russian internal routing / unprobed configurations">⚪ Direct (RU)</span>`;
+      }
+
       groupsHtml += `
-    <div class="group-card" data-test-url="${testUrl}">
+    <div class="group-card" data-location="${location}">
       <div class="group-header" onclick="toggleGroup(this)">
         <div class="group-title">
           <span class="location-name">${location}</span>
           <span class="node-count">${countText}</span>
-          <span class="ping-indicator" id="ping-${location.replace(/[^a-zA-Z0-9]/g, '')}">[Testing...]</span>
+          ${countryStatusHtml}
         </div>
         <span class="material-symbols-outlined chevron">expand_more</span>
       </div>
