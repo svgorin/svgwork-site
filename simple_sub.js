@@ -801,7 +801,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (parsed.flow) proxy.flow = parsed.flow;
-        if (parsed.fp) proxy["client-fingerprint"] = parsed.fp;
+        proxy["client-fingerprint"] = parsed.fp || "chrome";
         if (parsed.security === "reality") {
           proxy.reality = { pbk: parsed.pbk, sid: parsed.sid };
         }
@@ -915,12 +915,10 @@ const server = http.createServer((req, res) => {
             server_name: parsed.sni || parsed.host
           };
 
-          if (parsed.fp) {
-            outbound.tls.utls = {
-              enabled: true,
-              fingerprint: parsed.fp
-            };
-          }
+          outbound.tls.utls = {
+            enabled: true,
+            fingerprint: parsed.fp || "chrome"
+          };
 
           if (parsed.security === "reality") {
             outbound.tls.reality = {
