@@ -412,6 +412,17 @@ function fetchIpInfoJson(ip) {
 }
 
 async function resolveNodeGeo(link) {
+  if (link.includes('seltel9443')) {
+    return {
+      ip: "185.28.152.61",
+      countryCode: "IL",
+      countryName: "Israel",
+      flag: "🇮🇱",
+      provider: "Selectel ➔ OMC",
+      subtitle: "🇮🇱 IL, Israel",
+      testUrl: "https://ilpt2.svgrn.work/"
+    };
+  }
   const host = extractHostFromLink(link);
   if (!host) {
     return { subtitle: '🌐 Other Nodes', testUrl: '' };
@@ -449,6 +460,17 @@ async function resolveNodeGeo(link) {
 }
 
 function getNodeGeoSync(link) {
+  if (link.includes('seltel9443')) {
+    return {
+      ip: "185.28.152.61",
+      countryCode: "IL",
+      countryName: "Israel",
+      flag: "🇮🇱",
+      provider: "Selectel ➔ OMC",
+      subtitle: "🇮🇱 IL, Israel",
+      testUrl: "https://ilpt2.svgrn.work/"
+    };
+  }
   const host = extractHostFromLink(link);
   if (host && geoCache[host]) {
     return geoCache[host];
