@@ -412,7 +412,7 @@ function fetchIpInfoJson(ip) {
 }
 
 async function resolveNodeGeo(link) {
-  if (link.includes('seltel9443')) {
+  if (link.includes('seltel9443') || link.includes('seltel443')) {
     return {
       ip: "185.28.152.61",
       countryCode: "IL",
@@ -460,7 +460,7 @@ async function resolveNodeGeo(link) {
 }
 
 function getNodeGeoSync(link) {
-  if (link.includes('seltel9443')) {
+  if (link.includes('seltel9443') || link.includes('seltel443')) {
     return {
       ip: "185.28.152.61",
       countryCode: "IL",
