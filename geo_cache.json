@@ -133,5 +133,50 @@
     "provider": "1984",
     "subtitle": "🇮🇸 IS, Iceland",
     "testUrl": "https://89.126.249.223/"
+  },
+  "13.140.17.172": {
+    "ip": "13.140.17.172",
+    "countryCode": "LV",
+    "countryName": "Latvia",
+    "flag": "🇱🇻",
+    "provider": "Veesp",
+    "subtitle": "🇱🇻 LV, Latvia",
+    "testUrl": "https://13.140.17.172/"
+  },
+  "188.253.25.95": {
+    "ip": "188.253.25.95",
+    "countryCode": "NL",
+    "countryName": "Netherlands",
+    "flag": "🇳🇱",
+    "provider": "Veesp",
+    "subtitle": "🇳🇱 NL, Netherlands",
+    "testUrl": "https://188.253.25.95/"
+  },
+  "176.114.78.170": {
+    "ip": "176.114.78.170",
+    "countryCode": "RU",
+    "countryName": "Russia",
+    "flag": "🇷🇺",
+    "provider": "Selectel",
+    "subtitle": "🇷🇺 RU, Russia",
+    "testUrl": "https://176.114.78.170/"
+  },
+  "109.71.245.153": {
+    "ip": "109.71.245.153",
+    "countryCode": "RU",
+    "countryName": "Russia",
+    "flag": "🇷🇺",
+    "provider": "Timeweb",
+    "subtitle": "🇷🇺 RU, Russia",
+    "testUrl": "https://109.71.245.153/"
+  },
+  "77.110.105.81": {
+    "ip": "77.110.105.81",
+    "countryCode": "RU",
+    "countryName": "Russia",
+    "flag": "🇷🇺",
+    "provider": "Aeza",
+    "subtitle": "🇷🇺 RU, Russia",
+    "testUrl": "https://77.110.105.81/"
   }
 }
