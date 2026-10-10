@@ -16,6 +16,7 @@ module.exports = [
   "vless://57825bae-1d76-4be6-81ac-944734401557@176.114.78.170:51732?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=dl.google.com&pbk=_n5BSv-BFgNNg2Qku6Fy9Imn2ekOYVqllyQAUu7KHWw&sid=809ee562267e7965#SELTEL-REALITY",
   "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:443?encryption=none&type=tcp&security=tls&sni=seltel.svgrn.work&fp=chrome#seltel443",
   "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:9443?encryption=none&type=tcp&security=tls&sni=seltel.svgrn.work&fp=chrome#seltel9443",
+  "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:2053?type=ws&security=tls&path=%2Foqnmfvfwnaqnoeakciljqzzi&host=seltel.svgrn.work&sni=seltel.svgrn.work&encryption=none&fp=chrome#seltel1006ws",
   "vless://a4f61ab4-6b7d-423e-8af7-bb2423be783b@109.71.245.153:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=6N6BHYvPT9FgWrW74DexzmqJoN_-CpsUQlJW97hL3xI&sni=timeweb2.svgrn.work&sid=d2653f6888fbc20d#Timeweb-Reality",
   "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@109.71.245.153:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&sni=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK",
   "vless://266185b0-844a-4d00-af3a-384660196d6f@185.28.152.61:2053?fp=chrome&sni=ilpt2.svgrn.work&type=ws&path=%2FzG8sPvQe&host=ilpt2.svgrn.work&security=tls#url0327IL",
