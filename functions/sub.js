@@ -15,7 +15,7 @@ export async function onRequest(context) {
     });
   }
 
-                                                // 2. Define your node URLs (one per line)
+                                                  // 2. Define your node URLs (one per line)
   const nodeLinks = [
     "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@188.253.25.95:443?sni=veespnl.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#NL1002hy2",
     "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@188.253.25.95:20935?sni=veespnl.svgrn.work&obfs=salamander&obfs-password=svgobfshypass&mport=20000-50000#NL1002hy2-alt",
@@ -46,13 +46,7 @@ export async function onRequest(context) {
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@13.140.10.230:443?type=ws&security=tls&path=%2F12733%2FKiM8nbrWcB&host=veespse.svgrn.work&sni=veespse.svgrn.work&encryption=none#SE0922ws",
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@13.140.10.230:443?type=xhttp&encryption=none&path=%2FKkd0SCMpvP&host=veespse.svgrn.work&sni=veespse.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#SE0922xhttp",
     "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@13.140.10.230:443?sni=veespse.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#SE0922hy2",
-    "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@13.140.10.230:443?type=grpc&security=tls&serviceName=%2F25570%2FocUOBPBa59&authority=veespse.svgrn.work&sni=veespse.svgrn.work#SE0922trojan",
-    "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=cPYXCpebGrg2dgM60IXisBUfb_7p6JFdlZ0FJwDohUw&sni=is1984-2.svgrn.work&sid=428cdb76ec51db09#IS0922reality",
-    "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?type=ws&security=tls&path=%2F56772%2FxrpepGo43l&host=is1984.svgrn.work&sni=is1984.svgrn.work&encryption=none&fp=chrome#IS0922ws",
-    "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?type=xhttp&encryption=none&path=%2FT3LyARVh8q&host=is1984.svgrn.work&sni=is1984.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#IS0922xhttp",
-    "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?type=grpc&security=tls&serviceName=%2F14031%2Fg4hcnIVJUH&authority=is1984.svgrn.work&sni=is1984.svgrn.work#IS0922trojan",
-    "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?sni=is1984.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#IS0922hy2",
-    "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:20935?sni=is1984.svgrn.work&obfs=salamander&obfs-password=svgobfshypass&mport=20000-50000#IS0922hy2-alt"
+    "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@13.140.10.230:443?type=grpc&security=tls&serviceName=%2F25570%2FocUOBPBa59&authority=veespse.svgrn.work&sni=veespse.svgrn.work#SE0922trojan"
 ];
 
   const userAgent = (request.headers.get("User-Agent") || "").toLowerCase();
