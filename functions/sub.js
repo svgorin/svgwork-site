@@ -15,7 +15,7 @@ export async function onRequest(context) {
     });
   }
 
-                                                    // 2. Define your node URLs (one per line)
+                                                      // 2. Define your node URLs (one per line)
   const nodeLinks = [
     "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@188.253.25.95:443?sni=veespnl.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#NL1002hy2",
     "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@188.253.25.95:20935?sni=veespnl.svgrn.work&obfs=salamander&obfs-password=svgobfshypass&mport=20000-50000#NL1002hy2-alt",
@@ -35,7 +35,6 @@ export async function onRequest(context) {
     "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:2053?type=ws&security=tls&path=%2Foqnmfvfwnaqnoeakciljqzzi&host=seltel.svgrn.work&sni=seltel.svgrn.work&encryption=none&fp=chrome#seltel1006ws",
     "vless://a4f61ab4-6b7d-423e-8af7-bb2423be783b@109.71.245.153:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=6N6BHYvPT9FgWrW74DexzmqJoN_-CpsUQlJW97hL3xI&sni=timeweb2.svgrn.work&sid=d2653f6888fbc20d#Timeweb-Reality",
     "vless://78fb87ba-2ae1-4bb2-8ea4-096e623cec96@109.71.245.153:443?type=xhttp&encryption=none&path=%2FBxuJlQBYBs&host=timeweb.svgrn.work&sni=timeweb.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#TimewebMSK",
-    "vless://266185b0-844a-4d00-af3a-384660196d6f@185.28.152.61:2053?fp=chrome&sni=ilpt2.svgrn.work&type=ws&path=%2FzG8sPvQe&host=ilpt2.svgrn.work&security=tls#url0327IL",
     "vless://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@77.110.105.81:443?security=reality&encryption=none&pbk=GnT0D3D34FHXL5FOxurs7fjW-9_vvkuAP3lsROIU4T8&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=aeza2.svgrn.work&sid=f8ccb76bb6eea439#aeza-reality",
     "trojan://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@77.110.105.81:443?type=grpc&security=tls&serviceName=%2F37926%2FUtWbtCyfKb&authority=aeza.svgrn.work&sni=aeza.svgrn.work#%F0%9F%87%B7%F0%9F%87%BA%20aeza-msk-trojan",
     "vless://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@77.110.105.81:443?type=xhttp&encryption=none&path=%2FxqTuWcHfA6&host=aeza.svgrn.work&sni=aeza.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#aeza-msk-xhttp",
