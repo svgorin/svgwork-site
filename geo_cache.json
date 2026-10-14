@@ -178,5 +178,32 @@
     "provider": "Aeza",
     "subtitle": "🇷🇺 RU, Russia",
     "testUrl": "https://77.110.105.81/"
+  },
+  "179.237.121.125": {
+    "ip": "179.237.121.125",
+    "countryCode": "CH",
+    "countryName": "Switzerland",
+    "flag": "🇨🇭",
+    "provider": "Infomaniak",
+    "subtitle": "🇨🇭 CH, Switzerland",
+    "testUrl": "https://infoman.svgrn.work/"
+  },
+  "infoman.svgrn.work": {
+    "ip": "179.237.121.125",
+    "countryCode": "CH",
+    "countryName": "Switzerland",
+    "flag": "🇨🇭",
+    "provider": "Infomaniak",
+    "subtitle": "🇨🇭 CH, Switzerland",
+    "testUrl": "https://infoman.svgrn.work/"
+  },
+  "infoman2.svgrn.work": {
+    "ip": "179.237.121.125",
+    "countryCode": "CH",
+    "countryName": "Switzerland",
+    "flag": "🇨🇭",
+    "provider": "Infomaniak",
+    "subtitle": "🇨🇭 CH, Switzerland",
+    "testUrl": "https://infoman2.svgrn.work/"
   }
 }

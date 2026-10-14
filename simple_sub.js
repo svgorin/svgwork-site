@@ -600,9 +600,16 @@ function serveHtmlPage(res) {
       } else if (passCount > 0 && failCount > 0) {
         countryStatusHtml = `<span class="ping-indicator partial" title="${passCount} of ${passCount + failCount} configurations operational. Worst working latency: ${worstLatency}ms">🟡 Partial (${passCount}/${passCount + failCount}) · ${worstLatency}ms (worst)</span>`;
       } else if (failCount > 0 && passCount === 0) {
-        countryStatusHtml = `<span class="ping-indicator blocked" title="All ${failCount} tested configurations blocked by Russian TSPU">❌ Blocked</span>`;
+        const isRu = location.includes("Russia") || location.includes("RU");
+        if (isRu) {
+          countryStatusHtml = `<span class="ping-indicator unknown" title="Russian domestic internal routing">⚪ Direct (RU)</span>`;
+        } else {
+          countryStatusHtml = `<span class="ping-indicator blocked" title="All ${failCount} tested configurations blocked by Russian TSPU">❌ Blocked</span>`;
+        }
       } else {
-        countryStatusHtml = `<span class="ping-indicator unknown" title="Russian internal routing / unprobed configurations">⚪ Direct (RU)</span>`;
+        const isRu = location.includes("Russia") || location.includes("RU");
+        const defaultLabel = isRu ? "⚪ Direct (RU)" : "⚪ Unprobed";
+        countryStatusHtml = `<span class="ping-indicator unknown" title="Unprobed configurations">${defaultLabel}</span>`;
       }
 
       groupsHtml += `
