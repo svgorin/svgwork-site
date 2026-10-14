@@ -26,5 +26,12 @@ module.exports = [
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@77.110.105.81:443?type=ws&security=tls&path=%2F12514%2FxLaUTstJOD&host=aeza.svgrn.work&sni=aeza.svgrn.work&encryption=none#aeza1010ws-se",
 
   "wireguard://aMCrsVcZEmPqD2/d8hDlDcc8hZR1ww+owO2qPYOXX2k=@109.71.245.153:42720?address=10.0.0.2%2F32&publickey=xyMgj%2BaHp1HH6NnFQaCLF0OcQ60fJGEXpW7JRly%2F8Vo%3D&dns=1.1.1.1%2C+1.0.0.1&mtu=1420#%F0%9F%87%B7%F0%9F%87%BA%20timeweb-wg",
-  "wireguard://aMCrsVcZEmPqD2/d8hDlDcc8hZR1ww+owO2qPYOXX2k=@77.110.105.81:42720?address=10.0.0.2%2F32&publickey=xyMgj%2BaHp1HH6NnFQaCLF0OcQ60fJGEXpW7JRly%2F8Vo%3D&dns=1.1.1.1%2C+1.0.0.1&mtu=1420#%F0%9F%87%B7%F0%9F%87%BA%20aeza-wg"
+  "wireguard://aMCrsVcZEmPqD2/d8hDlDcc8hZR1ww+owO2qPYOXX2k=@77.110.105.81:42720?address=10.0.0.2%2F32&publickey=xyMgj%2BaHp1HH6NnFQaCLF0OcQ60fJGEXpW7JRly%2F8Vo%3D&dns=1.1.1.1%2C+1.0.0.1&mtu=1420#%F0%9F%87%B7%F0%9F%87%BA%20aeza-wg",
+
+  "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@179.237.121.125:443?sni=infoman.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#CH-hy2",
+  "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@179.237.121.125:443?sni=infoman.svgrn.work&obfs=salamander&obfs-password=svgobfshypass&mport=20000-50000#CH-hy2-alt",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@179.237.121.125:443?security=reality&encryption=none&headerType=none&fp=firefox&type=tcp&flow=xtls-rprx-vision&pbk=0jHHCBDqs6nzACSE1VU3yiCds76he7JbSY-QqMrk_hc&sni=infoman2.svgrn.work&sid=febd37e2cddd3c91#CH-Reality",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@179.237.121.125:443?type=ws&security=tls&path=%2F29242%2FxQloTT8jOf&host=infoman.svgrn.work&sni=infoman.svgrn.work&encryption=none&fp=firefox#CH-WS",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@179.237.121.125:443?type=xhttp&encryption=none&path=%2FD2vwToeTm9&host=infoman.svgrn.work&sni=infoman.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls&fp=firefox#CH-xHTTP",
+  "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@179.237.121.125:443?type=grpc&security=tls&serviceName=%2F48842%2F7fjQO94Ilr&authority=infoman.svgrn.work&sni=infoman.svgrn.work&fp=firefox#CH-Trojan"
 ];
