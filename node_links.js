@@ -6,7 +6,7 @@ module.exports = [
   "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@13.140.17.172:443?type=grpc&security=tls&serviceName=%2F36395%2FD86ifozy18&authority=veesp.svgrn.work&sni=veesp.svgrn.work#LV0808trojan",
   "hysteria2://d1dcec4a-9f55-4073-b068-b1073d2f583d@13.140.17.172:443?sni=veesp.svgrn.work&obfs=salamander&obfs-password=svgobfshypass#LV0808hy2",
 
-  "vless://57825bae-1d76-4be6-81ac-944734401557@176.114.78.170:51732?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=dl.google.com&pbk=_n5BSv-BFgNNg2Qku6Fy9Imn2ekOYVqllyQAUu7KHWw&sid=809ee562267e7965#SELTEL-REALITY",
+  "vless://57825bae-1d76-4be6-81ac-944734401557@176.114.78.170:51732?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=seltel2.svgrn.work&pbk=vv6X-N1qDE6hsW4Av3MdVneqCQztAQzdY1qxfSQZ-yA&sid=809ee562267e7965#SELTEL-REALITY",
   "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:443?encryption=none&type=tcp&security=tls&sni=seltel.svgrn.work&fp=chrome#seltel443",
   "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:9443?encryption=none&type=tcp&security=tls&sni=seltel.svgrn.work&fp=chrome#seltel9443",
   "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:2053?type=ws&security=tls&path=%2Foqnmfvfwnaqnoeakciljqzzi&host=seltel.svgrn.work&sni=seltel.svgrn.work&encryption=none&fp=chrome#seltel1006ws",
