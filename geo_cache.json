@@ -44,24 +44,6 @@
     "subtitle": "🇷🇺 RU, Russia",
     "testUrl": "https://seltel.svgrn.work/"
   },
-  "timeweb2.svgrn.work": {
-    "ip": "109.71.245.153",
-    "countryCode": "RU",
-    "countryName": "Russia",
-    "flag": "🇷🇺",
-    "provider": "Timeweb",
-    "subtitle": "🇷🇺 RU, Russia",
-    "testUrl": "https://timeweb2.svgrn.work/"
-  },
-  "timeweb.svgrn.work": {
-    "ip": "109.71.245.153",
-    "countryCode": "RU",
-    "countryName": "Russia",
-    "flag": "🇷🇺",
-    "provider": "Timeweb",
-    "subtitle": "🇷🇺 RU, Russia",
-    "testUrl": "https://timeweb.svgrn.work/"
-  },
   "ilpt2.svgrn.work": {
     "ip": "185.28.152.61",
     "countryCode": "IL",
@@ -160,15 +142,6 @@
     "provider": "Selectel",
     "subtitle": "🇷🇺 RU, Russia",
     "testUrl": "https://176.114.78.170/"
-  },
-  "109.71.245.153": {
-    "ip": "109.71.245.153",
-    "countryCode": "RU",
-    "countryName": "Russia",
-    "flag": "🇷🇺",
-    "provider": "Timeweb",
-    "subtitle": "🇷🇺 RU, Russia",
-    "testUrl": "https://109.71.245.153/"
   },
   "77.110.105.81": {
     "ip": "77.110.105.81",
