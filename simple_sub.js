@@ -411,7 +411,57 @@ function fetchIpInfoJson(ip) {
   });
 }
 
+const CASCADE_EXITS = {
+  'seltel-ws-ch': {
+    countryCode: 'CH',
+    countryName: 'Switzerland',
+    flag: '🇨🇭',
+    provider: 'Infomaniak',
+    subtitle: '🇨🇭 CH, Switzerland',
+    testUrl: 'https://infoman.svgrn.work/'
+  },
+  'aeza1010ws-se': {
+    countryCode: 'SE',
+    countryName: 'Sweden',
+    flag: '🇸🇪',
+    provider: 'AWS Stockholm',
+    subtitle: '🇸🇪 SE, Sweden',
+    testUrl: 'https://veespse.svgrn.work/'
+  },
+  'aeza1010ws-is': {
+    countryCode: 'IS',
+    countryName: 'Iceland',
+    flag: '🇮🇸',
+    provider: '1984 Hosting',
+    subtitle: '🇮🇸 IS, Iceland',
+    testUrl: 'https://is1984.svgrn.work/'
+  }
+};
+
+function getCascadeExitGeo(link, nodeName) {
+  let name = nodeName;
+  if (!name && link) {
+    try {
+      const u = new URL(link);
+      if (u.hash) name = decodeURIComponent(u.hash.substring(1));
+    } catch (e) {}
+  }
+  if (!name) return null;
+
+  const cleanName = name.replace(/^[\s\u200b\uFEFF🔀?]+/, '').trim();
+  if (CASCADE_EXITS[cleanName]) return CASCADE_EXITS[cleanName];
+  if (cleanName.endsWith('-ch')) return CASCADE_EXITS['seltel-ws-ch'];
+  if (cleanName.endsWith('-se')) return CASCADE_EXITS['aeza1010ws-se'];
+  if (cleanName.endsWith('-is')) return CASCADE_EXITS['aeza1010ws-is'];
+  return null;
+}
+
 async function resolveNodeGeo(link) {
+  const cascadeGeo = getCascadeExitGeo(link);
+  if (cascadeGeo) {
+    return cascadeGeo;
+  }
+
   const host = extractHostFromLink(link);
   if (!host) {
     return { subtitle: '🌐 Other Nodes', testUrl: '' };
@@ -448,7 +498,11 @@ async function resolveNodeGeo(link) {
   return { subtitle: `🌐 ${host}`, testUrl: `https://${host}/` };
 }
 
-function getNodeGeoSync(link) {
+function getNodeGeoSync(link, nodeName) {
+  const cascadeGeo = getCascadeExitGeo(link, nodeName);
+  if (cascadeGeo) {
+    return cascadeGeo;
+  }
   const host = extractHostFromLink(link);
   if (host && geoCache[host]) {
     return geoCache[host];
@@ -499,7 +553,7 @@ function serveHtmlPage(res) {
       const parsed = parseNode(link);
       if (!parsed) continue;
 
-      const geo = getNodeGeoSync(link);
+      const geo = getNodeGeoSync(link, parsed.name);
       const subtitle = geo.subtitle;
       if (!groups[subtitle]) {
         groups[subtitle] = { testUrl: geo.testUrl, nodes: [] };
