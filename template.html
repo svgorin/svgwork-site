@@ -216,6 +216,13 @@
       border-color: rgba(255, 255, 255, 0.15);
     }
 
+    .filter-checkbox-label:has(input:checked) {
+      background: var(--primary-glow);
+      border-color: var(--primary);
+      color: var(--text-main);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+    }
+
     .filter-checkbox-label input[type="checkbox"] {
       accent-color: #10b981;
       width: 15px;
@@ -584,6 +591,10 @@
           <input type="checkbox" id="working-only-check" onchange="applyFilters()">
           <span>Working only</span>
         </label>
+        <label class="filter-checkbox-label">
+          <input type="checkbox" id="cascaded-only-check" onchange="applyFilters()">
+          <span>🔀 Cascaded only</span>
+        </label>
         <button id="sort-name-btn" class="sort-btn active" onclick="sortTables('name')">
           <span class="material-symbols-outlined">sort_by_alpha</span> By Name
         </button>
@@ -621,12 +632,18 @@
 
     function applyFilters() {
       const workingOnly = document.getElementById('working-only-check')?.checked;
+      const cascadedOnly = document.getElementById('cascaded-only-check')?.checked;
       const rows = document.querySelectorAll('#node-groups tbody tr');
       rows.forEach(row => {
         const status = row.getAttribute('data-status');
+        const name = row.getAttribute('data-name') || '';
+        const isCascade = row.getAttribute('data-cascade') === 'true' || name.includes('🔀') || name.toLowerCase().includes('cascade');
         let show = true;
-        if (workingOnly) {
-          show = (status === 'PASS');
+        if (workingOnly && status !== 'PASS') {
+          show = false;
+        }
+        if (cascadedOnly && !isCascade) {
+          show = false;
         }
         row.style.display = show ? '' : 'none';
       });

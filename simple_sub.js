@@ -577,8 +577,9 @@ function serveHtmlPage(res) {
             </button>`;
         }
 
+        const isCascade = node.name.includes('🔀') || node.name.toLowerCase().includes('cascade');
         rowsHtml += `
-          <tr data-name="${node.name}" data-status="${status}" data-latency="${probe && probe.latency ? probe.latency : 9999}">
+          <tr data-name="${node.name}" data-status="${status}" data-latency="${probe && probe.latency ? probe.latency : 9999}" data-cascade="${isCascade}">
             <td>
               <div class="node-info">
                 <div class="node-name">
