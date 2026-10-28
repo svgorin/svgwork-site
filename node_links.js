@@ -11,6 +11,7 @@ module.exports = [
   "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:9443?encryption=none&type=tcp&security=tls&sni=seltel.svgrn.work&fp=chrome#seltel9443",
   "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:2053?type=ws&security=tls&path=%2Foqnmfvfwnaqnoeakciljqzzi&host=seltel.svgrn.work&sni=seltel.svgrn.work&encryption=none&fp=chrome#seltel1006ws",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@176.114.78.170:2083?type=ws&security=tls&path=%2Fch-cascade%2Fws&host=seltel.svgrn.work&sni=seltel.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20seltel-ws-ch",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@176.114.78.170:2087?type=ws&security=tls&path=%2Fnl-cascade%2Fws&host=seltel.svgrn.work&sni=seltel.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20seltel-ws-nl",
 
   "vless://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@77.110.105.81:443?security=reality&encryption=none&pbk=GnT0D3D34FHXL5FOxurs7fjW-9_vvkuAP3lsROIU4T8&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=aeza2.svgrn.work&sid=f8ccb76bb6eea439#aeza-reality",
   "trojan://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@77.110.105.81:443?type=grpc&security=tls&serviceName=%2F37926%2FUtWbtCyfKb&authority=aeza.svgrn.work&sni=aeza.svgrn.work#%F0%9F%87%B7%F0%9F%87%BA%20aeza-msk-trojan",
