@@ -420,6 +420,14 @@ const CASCADE_EXITS = {
     subtitle: '🇨🇭 CH, Switzerland',
     testUrl: 'https://infoman.svgrn.work/'
   },
+  'seltel-ws-nl': {
+    countryCode: 'NL',
+    countryName: 'Netherlands',
+    flag: '🇳🇱',
+    provider: 'Timeweb Amsterdam',
+    subtitle: '🇳🇱 NL, Netherlands',
+    testUrl: 'https://timeweb-nl.svgrn.work/'
+  },
   'aeza1010ws-se': {
     countryCode: 'SE',
     countryName: 'Sweden',
@@ -451,6 +459,7 @@ function getCascadeExitGeo(link, nodeName) {
   const cleanName = name.replace(/^[\s\u200b\uFEFF🔀?]+/, '').trim();
   if (CASCADE_EXITS[cleanName]) return CASCADE_EXITS[cleanName];
   if (cleanName.endsWith('-ch')) return CASCADE_EXITS['seltel-ws-ch'];
+  if (cleanName.endsWith('-nl')) return CASCADE_EXITS['seltel-ws-nl'];
   if (cleanName.endsWith('-se')) return CASCADE_EXITS['aeza1010ws-se'];
   if (cleanName.endsWith('-is')) return CASCADE_EXITS['aeza1010ws-is'];
   return null;
