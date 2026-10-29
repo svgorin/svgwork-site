@@ -451,6 +451,14 @@ const CASCADE_EXITS = {
     provider: 'Veesp Riga',
     subtitle: '🇱🇻 LV, Latvia',
     testUrl: 'https://veesp.svgrn.work/'
+  },
+  'aeza1010ws-nl': {
+    countryCode: 'NL',
+    countryName: 'Netherlands',
+    flag: '🇳🇱',
+    provider: 'Veesp Amsterdam',
+    subtitle: '🇳🇱 NL, Netherlands',
+    testUrl: 'https://veespnl.svgrn.work/'
   }
 };
 
