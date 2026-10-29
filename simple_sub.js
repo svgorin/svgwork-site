@@ -443,6 +443,14 @@ const CASCADE_EXITS = {
     provider: '1984 Hosting',
     subtitle: '🇮🇸 IS, Iceland',
     testUrl: 'https://is1984.svgrn.work/'
+  },
+  'aeza1010ws-lv': {
+    countryCode: 'LV',
+    countryName: 'Latvia',
+    flag: '🇱🇻',
+    provider: 'Veesp Riga',
+    subtitle: '🇱🇻 LV, Latvia',
+    testUrl: 'https://veesp.svgrn.work/'
   }
 };
 
@@ -462,6 +470,7 @@ function getCascadeExitGeo(link, nodeName) {
   if (cleanName.endsWith('-nl')) return CASCADE_EXITS['seltel-ws-nl'];
   if (cleanName.endsWith('-se')) return CASCADE_EXITS['aeza1010ws-se'];
   if (cleanName.endsWith('-is')) return CASCADE_EXITS['aeza1010ws-is'];
+  if (cleanName.endsWith('-lv')) return CASCADE_EXITS['aeza1010ws-lv'];
   return null;
 }
 

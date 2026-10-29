@@ -15,7 +15,7 @@ export async function onRequest(context) {
     });
   }
 
-                                                                                              // 2. Define your node URLs (one per line)
+                                                                                                  // 2. Define your node URLs (one per line)
   const nodeLinks = [
     "vless://57825bae-1d76-4be6-81ac-944734401557@176.114.78.170:51732?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=seltel2.svgrn.work&pbk=vv6X-N1qDE6hsW4Av3MdVneqCQztAQzdY1qxfSQZ-yA&sid=809ee562267e7965#SELTEL-REALITY",
     "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:443?encryption=none&type=tcp&security=tls&sni=seltel.svgrn.work&fp=chrome#seltel443",
@@ -28,6 +28,7 @@ export async function onRequest(context) {
     "vless://4e1f7a28-98e6-42d7-a5c3-8f0d8a5c1b92@77.110.105.81:443?type=xhttp&encryption=none&path=%2FxqTuWcHfA6&host=aeza.svgrn.work&sni=aeza.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#aeza-msk-xhttp",
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@77.110.105.81:443?type=ws&security=tls&path=%2F12514%2FxLaUTstJOD&host=aeza.svgrn.work&sni=aeza.svgrn.work&encryption=none#%F0%9F%94%80%20aeza1010ws-se",
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@77.110.105.81:443?type=ws&security=tls&path=%2F12515%2FxLaUTstJOD&host=aeza.svgrn.work&sni=aeza.svgrn.work&encryption=none#%F0%9F%94%80%20aeza1010ws-is",
+    "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@77.110.105.81:443?type=ws&security=tls&path=%2F12516%2FxLaUTstJOD&host=aeza.svgrn.work&sni=aeza.svgrn.work&encryption=none#%F0%9F%94%80%20aeza1010ws-lv",
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=cPYXCpebGrg2dgM60IXisBUfb_7p6JFdlZ0FJwDohUw&sni=is1984-2.svgrn.work&sid=428cdb76ec51db09#IS0922reality",
     "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?type=xhttp&encryption=none&path=%2FT3LyARVh8q&host=is1984.svgrn.work&sni=is1984.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#IS0922xhttp",
     "trojan://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?type=grpc&security=tls&serviceName=%2F14031%2Fg4hcnIVJUH&authority=is1984.svgrn.work&sni=is1984.svgrn.work#IS0922trojan",
