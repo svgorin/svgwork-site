@@ -467,6 +467,14 @@ const CASCADE_EXITS = {
     provider: 'Kamatera Petah Tiqva',
     subtitle: '🇮🇱 IL, Israel',
     testUrl: 'https://ifconfig.co/'
+  },
+  'aeza1010ws-ch': {
+    countryCode: 'CH',
+    countryName: 'Switzerland',
+    flag: '🇨🇭',
+    provider: 'Infomaniak Geneva',
+    subtitle: '🇨🇭 CH, Switzerland',
+    testUrl: 'https://infoman.svgrn.work/'
   }
 };
 
