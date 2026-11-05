@@ -459,6 +459,14 @@ const CASCADE_EXITS = {
     provider: 'Veesp Amsterdam',
     subtitle: '🇳🇱 NL, Netherlands',
     testUrl: 'https://veespnl.svgrn.work/'
+  },
+  'aeza1010ws-il': {
+    countryCode: 'IL',
+    countryName: 'Israel',
+    flag: '🇮🇱',
+    provider: 'Kamatera Petah Tiqva',
+    subtitle: '🇮🇱 IL, Israel',
+    testUrl: 'https://ifconfig.co/'
   }
 };
 
@@ -479,6 +487,7 @@ function getCascadeExitGeo(link, nodeName) {
   if (cleanName.endsWith('-se')) return CASCADE_EXITS['aeza1010ws-se'];
   if (cleanName.endsWith('-is')) return CASCADE_EXITS['aeza1010ws-is'];
   if (cleanName.endsWith('-lv')) return CASCADE_EXITS['aeza1010ws-lv'];
+  if (cleanName.endsWith('-il')) return CASCADE_EXITS['aeza1010ws-il'];
   return null;
 }
 
