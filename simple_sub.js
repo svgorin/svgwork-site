@@ -662,30 +662,12 @@ function refreshSelectelTelemetry() {
       }
     } catch (e) {}
 
-    // 4. Cumulative Total Transferred Bytes
-    let totalBytes = 0;
-    let totalRxBytes = 0;
-    let totalTxBytes = 0;
-    try {
-      const fullJson = JSON.parse(execSync('vnstat --json', { encoding: 'utf8', timeout: 2000 }));
-      for (const iface of (fullJson.interfaces || [])) {
-        if (iface.name === 'eth0') {
-          totalRxBytes = iface.traffic?.total?.rx || 0;
-          totalTxBytes = iface.traffic?.total?.tx || 0;
-          totalBytes = totalRxBytes + totalTxBytes;
-        }
-      }
-    } catch (e) {}
-
     selectelTelemetryCache = {
       updated_at: now,
       rate_display: rateDisplay,
       rate_down_str: rxStr,
       rate_up_str: txStr,
       max_rate_display: maxRateDisplay,
-      total_bytes: totalBytes,
-      total_down_bytes: totalRxBytes,
-      total_up_bytes: totalTxBytes,
       sockets
     };
   } catch (err) {
@@ -714,81 +696,10 @@ function enrichSelectelNodes(probeNodes) {
       rate_down_str: tele.rate_down_str,
       rate_up_str: tele.rate_up_str,
       max_rate_display: tele.max_rate_display,
-      total_bytes: tele.total_bytes || 0,
-      total_down_bytes: tele.total_down_bytes || 0,
-      total_up_bytes: tele.total_up_bytes || 0,
       server: 'Selectel SPb (eth0)',
       sampled_at: nowIso
     };
   }
-}
-
-function parseRateToBps(str) {
-  if (!str) return 0;
-  const m = str.match(/([0-9.]+)\s*([a-zA-Z/]+)/);
-  if (!m) return 0;
-  const val = parseFloat(m[1]);
-  const unit = m[2].toLowerCase();
-  if (unit.includes('mbit')) return (val * 1000000) / 8;
-  if (unit.includes('kbit')) return (val * 1000) / 8;
-  if (unit.includes('gbit')) return (val * 1000000000) / 8;
-  if (unit.includes('mb/s') || unit.includes('mbyte')) return val * 1024 * 1024;
-  if (unit.includes('kb/s') || unit.includes('kbyte')) return val * 1024;
-  if (unit.includes('b/s')) return val;
-  return val;
-}
-
-function formatBytes(bytes) {
-  if (!bytes || bytes === 0) return { short: '0 B', exact: '0 bytes', full: '0 B (0 bytes)' };
-  const num = Number(bytes);
-  const exact = num.toLocaleString('en-US') + ' bytes';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-  const i = Math.floor(Math.log(num) / Math.log(k));
-  const short = parseFloat((num / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  return { short, exact, full: `${short} (${exact})` };
-}
-
-function formatBps(bps) {
-  if (!bps || bps <= 0) return '0 B/s';
-  if (bps >= 1024 * 1024 * 1024) return (bps / (1024 * 1024 * 1024)).toFixed(2) + ' GB/s';
-  if (bps >= 1024 * 1024) return (bps / (1024 * 1024)).toFixed(2) + ' MB/s';
-  if (bps >= 1024) return (bps / 1024).toFixed(2) + ' KB/s';
-  return Math.round(bps).toLocaleString('en-US') + ' B/s';
-}
-
-function convertCompoundRate(str) {
-  if (!str || str === 'N/A' || str === '0 KB/s' || str === '0 kbit/s') {
-    return { display: str || '0 B/s', exact: '0 B/s', totalExact: '0 B/s', original: str || '0 KB/s' };
-  }
-  let rxMatch = str.match(/(?:↓\s*|down\s*:\s*|^)([0-9.]+\s*[a-zA-Z/]+)/i);
-  let txMatch = str.match(/(?:↑\s*|up\s*:\s*|·\s*↑\s*)([0-9.]+\s*[a-zA-Z/]+)/i);
-  if (str.includes('down') && str.includes('up')) {
-    const p1 = str.match(/([0-9.]+\s*[a-zA-Z/]+)\s*down/i);
-    const p2 = str.match(/([0-9.]+\s*[a-zA-Z/]+)\s*up/i);
-    if (p1 && p2) {
-      rxMatch = p1;
-      txMatch = p2;
-    }
-  }
-  if (rxMatch && txMatch) {
-    const rxBps = parseRateToBps(rxMatch[1]);
-    const txBps = parseRateToBps(txMatch[1]);
-    const totBps = rxBps + txBps;
-    return {
-      display: '↓ ' + formatBps(rxBps) + ' · ↑ ' + formatBps(txBps),
-      exact: '↓ ' + Math.round(rxBps).toLocaleString('en-US') + ' B/s · ↑ ' + Math.round(txBps).toLocaleString('en-US') + ' B/s',
-      totalExact: Math.round(totBps).toLocaleString('en-US') + ' B/s total',
-      original: str
-    };
-  }
-  const singleBps = parseRateToBps(str);
-  return {
-    display: formatBps(singleBps),
-    exact: Math.round(singleBps).toLocaleString('en-US') + ' B/s',
-    totalExact: Math.round(singleBps).toLocaleString('en-US') + ' B/s',
-    original: str
-  };
 }
 
 function generateVpsFleetHtml(probeNodes, selectelTele) {
@@ -833,13 +744,11 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
 
   let fleetTotalSockets = 0;
   let fleetTotalProfiles = 0;
-  let fleetTotalBytes = 0;
   let serverRowsHtml = '';
 
   for (const vps of VPS_DEFINITIONS) {
     const matchedProfiles = [];
     let serverSockets = 0;
-    let serverTotalBytes = 0;
     let rateDisplay = 'N/A';
     let maxRateDisplay = 'N/A';
 
@@ -848,11 +757,7 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
       const srv = traffic.server || '';
       if (vps.match(name, srv)) {
         const soc = traffic.open_sockets || 0;
-        const bytes = traffic.total_bytes || 0;
         serverSockets += soc;
-        if (bytes > serverTotalBytes) {
-          serverTotalBytes = bytes;
-        }
         if (traffic.rate_display && traffic.rate_display !== '0 KB/s' && traffic.rate_display !== '0 kbit/s') {
           rateDisplay = traffic.rate_display;
         } else if (rateDisplay === 'N/A' && traffic.rate_display) {
@@ -861,40 +766,26 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
         if (traffic.max_rate_display && traffic.max_rate_display !== 'N/A') {
           maxRateDisplay = traffic.max_rate_display;
         }
-        matchedProfiles.push({ name, sockets: soc, total_bytes: bytes });
+        matchedProfiles.push({ name, sockets: soc });
       }
     }
 
     if (vps.id === 'selectel' && selectelTele) {
       if (selectelTele.rate_display) rateDisplay = selectelTele.rate_display;
       if (selectelTele.max_rate_display) maxRateDisplay = selectelTele.max_rate_display;
-      if (selectelTele.total_bytes) serverTotalBytes = selectelTele.total_bytes;
     }
 
-    if (vps.id === 'aeza') {
-      const sumAeza = matchedProfiles.reduce((acc, p) => acc + (p.total_bytes || 0), 0);
-      if (sumAeza > 0) serverTotalBytes = sumAeza;
-    }
-
-    matchedProfiles.sort((a, b) => (b.sockets - a.sockets) || (b.total_bytes - a.total_bytes) || a.name.localeCompare(b.name));
+    matchedProfiles.sort((a, b) => (b.sockets - a.sockets) || a.name.localeCompare(b.name));
 
     fleetTotalSockets += serverSockets;
     fleetTotalProfiles += matchedProfiles.length;
-    fleetTotalBytes += serverTotalBytes;
-
-    const liveRate = convertCompoundRate(rateDisplay);
-    const peakRate = convertCompoundRate(maxRateDisplay);
-    const volInfo = formatBytes(serverTotalBytes);
 
     let profilePillsHtml = matchedProfiles.map(p => {
       const escaped = encodeURIComponent(p.name);
       const socBadge = p.sockets > 0 
         ? `<span class="inbound-soc active">${p.sockets}</span>` 
         : `<span class="inbound-soc zero">0</span>`;
-      const bytesBadge = p.total_bytes > 0
-        ? `<span class="inbound-soc bytes" title="${Number(p.total_bytes).toLocaleString('en-US')} bytes">${formatBytes(p.total_bytes).short}</span>`
-        : '';
-      return `<button class="inbound-pill" onclick="openStatsModal(decodeURIComponent('${escaped}'))" title="Open ${p.name} Telemetry">${p.name} ${socBadge}${bytesBadge}</button>`;
+      return `<button class="inbound-pill" onclick="openStatsModal(decodeURIComponent('${escaped}'))" title="Open ${p.name} Telemetry">${p.name} ${socBadge}</button>`;
     }).join(' ');
 
     if (!profilePillsHtml) {
@@ -922,12 +813,12 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
           </div>
         </td>
         <td>
-          <div class="vps-rate-val">${liveRate.display}</div>
-          <div class="vps-rate-sub" title="${liveRate.exact}">${liveRate.exact} · <span style="opacity:0.75;">${rateDisplay}</span></div>
+          <div class="vps-rate-val">${rateDisplay}</div>
+          <div class="vps-rate-sub">vnStat Live Throughput</div>
         </td>
         <td>
-          <div class="vps-rate-val">${peakRate.display}</div>
-          <div class="vps-rate-sub" title="${peakRate.exact}">${peakRate.exact} · <span style="opacity:0.75;">${maxRateDisplay}</span></div>
+          <div class="vps-rate-val">${maxRateDisplay}</div>
+          <div class="vps-rate-sub">24h Peak Recorded</div>
         </td>
         <td style="max-width:380px;">
           <div class="vps-inbounds-wrap">
@@ -935,16 +826,11 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
           </div>
         </td>
         <td>
-          <div style="display:flex; flex-direction:column; gap:0.35rem;">
-            <span class="vps-status-pill">${vps.status}</span>
-            <span style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;" title="${volInfo.exact}">📦 ${volInfo.short}</span>
-          </div>
+          <span class="vps-status-pill">${vps.status}</span>
         </td>
       </tr>
     `;
   }
-
-  const fleetVolInfo = formatBytes(fleetTotalBytes);
 
   return `
     <div class="vps-fleet-card">
@@ -968,11 +854,6 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
             <strong class="fleet-stat-val">${fleetTotalSockets}</strong>
           </div>
           <div class="fleet-stat-pill">
-            <span class="material-symbols-outlined" style="font-size:16px; color:#a78bfa;">data_usage</span>
-            <span class="fleet-stat-label">Fleet Traffic:</span>
-            <strong class="fleet-stat-val" title="${fleetVolInfo.exact}">${fleetVolInfo.short}</strong>
-          </div>
-          <div class="fleet-stat-pill">
             <span class="material-symbols-outlined" style="font-size:16px; color:#60a5fa;">router</span>
             <span class="fleet-stat-label">Inbounds:</span>
             <strong class="fleet-stat-val">${fleetTotalProfiles}</strong>
@@ -987,10 +868,10 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
               <tr>
                 <th>Physical Server</th>
                 <th>Total Sockets</th>
-                <th>Live Rate (bytes)</th>
-                <th>24h Peak Rate (bytes)</th>
+                <th>Live Rate (vnstat)</th>
+                <th>24h Peak Rate</th>
                 <th>Hosted Profiles Breakdown</th>
-                <th>Status & Volume</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -1063,8 +944,6 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
             rate_up_str: traffic.rate_up_str || '0 KB/s',
             max_rate_display: traffic.max_rate_display || 'N/A',
             total_bytes: traffic.total_bytes || 0,
-            total_down_bytes: traffic.total_down_bytes || 0,
-            total_up_bytes: traffic.total_up_bytes || 0,
             server: traffic.server || (node.name.includes('aeza') ? 'Aeza Moscow (enp0s3)' : 'Selectel SPb (eth0)'),
             sampled_at: traffic.sampled_at || (probe && probe.checked_at) || ''
           };
@@ -1274,72 +1153,12 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
       ${JSON.stringify(trafficMap)}
       </script>
       <script>
-        function parseRateToBps(str) {
-          if (!str) return 0;
-          const m = str.match(/([0-9.]+)\\s*([a-zA-Z/]+)/);
-          if (!m) return 0;
-          const val = parseFloat(m[1]);
-          const unit = m[2].toLowerCase();
-          if (unit.includes('mbit')) return (val * 1000000) / 8;
-          if (unit.includes('kbit')) return (val * 1000) / 8;
-          if (unit.includes('gbit')) return (val * 1000000000) / 8;
-          if (unit.includes('mb/s') || unit.includes('mbyte')) return val * 1024 * 1024;
-          if (unit.includes('kb/s') || unit.includes('kbyte')) return val * 1024;
-          if (unit.includes('b/s')) return val;
-          return val;
-        }
-
         function formatBytes(bytes) {
-          if (!bytes || bytes === 0) return { short: '0 B', exact: '0 bytes' };
-          const num = Number(bytes);
-          const exact = num.toLocaleString('en-US') + ' bytes';
+          if (!bytes || bytes === 0) return '0 B';
           const k = 1024;
-          const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-          const i = Math.floor(Math.log(num) / Math.log(k));
-          const short = parseFloat((num / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-          return { short, exact };
-        }
-
-        function formatBps(bps) {
-          if (!bps || bps <= 0) return '0 B/s';
-          if (bps >= 1024 * 1024 * 1024) return (bps / (1024 * 1024 * 1024)).toFixed(2) + ' GB/s';
-          if (bps >= 1024 * 1024) return (bps / (1024 * 1024)).toFixed(2) + ' MB/s';
-          if (bps >= 1024) return (bps / 1024).toFixed(2) + ' KB/s';
-          return Math.round(bps).toLocaleString('en-US') + ' B/s';
-        }
-
-        function convertCompoundRate(str) {
-          if (!str || str === 'N/A' || str === '0 KB/s' || str === '0 kbit/s') {
-            return { display: str || '0 B/s', exact: '0 B/s', totalExact: '0 B/s', original: str || '0 KB/s' };
-          }
-          let rxMatch = str.match(/(?:↓\\s*|down\\s*:\\s*|^)([0-9.]+\\s*[a-zA-Z/]+)/i);
-          let txMatch = str.match(/(?:↑\\s*|up\\s*:\\s*|·\\s*↑\\s*)([0-9.]+\\s*[a-zA-Z/]+)/i);
-          if (str.includes('down') && str.includes('up')) {
-            const p1 = str.match(/([0-9.]+\\s*[a-zA-Z/]+)\\s*down/i);
-            const p2 = str.match(/([0-9.]+\\s*[a-zA-Z/]+)\\s*up/i);
-            if (p1 && p2) {
-              rxMatch = p1;
-              txMatch = p2;
-            }
-          }
-          if (rxMatch && txMatch) {
-            const rxBps = parseRateToBps(rxMatch[1]);
-            const txBps = parseRateToBps(txMatch[1]);
-            const totBps = rxBps + txBps;
-            return {
-              display: '↓ ' + formatBps(rxBps) + ' · ↑ ' + formatBps(txBps),
-              exact: '↓ ' + Math.round(rxBps).toLocaleString('en-US') + ' B/s · ↑ ' + Math.round(txBps).toLocaleString('en-US') + ' B/s',
-              totalExact: Math.round(totBps).toLocaleString('en-US') + ' B/s total',
-              original: str
-            };
-          }
-          const singleBps = parseRateToBps(str);
-          return {
-            display: formatBps(singleBps),
-            exact: Math.round(singleBps).toLocaleString('en-US') + ' B/s',
-            totalExact: Math.round(singleBps).toLocaleString('en-US') + ' B/s',
-            original: str
-          };
+          const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
         function openStatsModal(nodeName) {
@@ -1351,24 +1170,11 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
             
             document.getElementById('modal-node-name').textContent = nodeName;
             document.getElementById('modal-node-sub').textContent = (data.country || 'Node') + ' · ' + (data.server || 'Transit Server');
-            
-            const rateInfo = convertCompoundRate(data.rate_display);
-            document.getElementById('modal-rate').textContent = rateInfo.display;
-            document.getElementById('modal-rate-sub').textContent = rateInfo.exact + ' (' + rateInfo.original + ')';
-            
+            document.getElementById('modal-rate').textContent = data.rate_display || '0 KB/s';
+            document.getElementById('modal-rate-sub').textContent = (data.rate_down_str && data.rate_up_str) ? ('↓ ' + data.rate_down_str + ' · ↑ ' + data.rate_up_str) : 'Live throughput (vnstat)';
             document.getElementById('modal-sockets').textContent = data.open_sockets || '0';
-            
-            const peakInfo = convertCompoundRate(data.max_rate_display);
-            document.getElementById('modal-max-rate').textContent = peakInfo.display;
-            document.getElementById('modal-max-rate-sub').textContent = peakInfo.exact + ' (' + (data.max_rate_display || 'peak') + ')';
-            
-            const volInfo = formatBytes(data.total_bytes);
-            document.getElementById('modal-total-bytes').textContent = volInfo.short;
-            let volSub = volInfo.exact;
-            if (data.total_down_bytes || data.total_up_bytes) {
-              volSub += ' (↓ ' + formatBytes(data.total_down_bytes).short + ' · ↑ ' + formatBytes(data.total_up_bytes).short + ')';
-            }
-            document.getElementById('modal-total-sub').textContent = volSub;
+            document.getElementById('modal-max-rate').textContent = data.max_rate_display || 'N/A';
+            document.getElementById('modal-total-bytes').textContent = formatBytes(data.total_bytes);
             
             let sampleText = 'Last sampled: Live telemetry';
             if (data.sampled_at) {
