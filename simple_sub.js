@@ -723,6 +723,15 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
       match: (name, srv) => srv.includes('Aeza') || name.toLowerCase().includes('aeza')
     },
     {
+      id: 'veesp-lv',
+      name: 'Veesp Latvia',
+      flag: '🇱🇻',
+      host: '13.140.17.172 · veesp.svgrn.work',
+      roleTag: 'Direct Baltic Inbounds & Exit',
+      status: '🟢 Remote Reporter',
+      match: (name, srv) => srv.includes('Veesp') || srv.includes('Latvia') || name.startsWith('LV0808') || name.toLowerCase().includes('veesp')
+    },
+    {
       id: 'geneva',
       name: 'Infomaniak Geneva',
       flag: '🇨🇭',
@@ -842,7 +851,7 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
           <div>
             <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
               <h2 style="font-size:1.15rem; font-weight:700; color:#fff; margin:0;">Distinct VPS Fleet Infrastructure</h2>
-              <span class="vps-badge-online">🟢 4 / 4 Nodes Operational</span>
+              <span class="vps-badge-online">🟢 ${VPS_DEFINITIONS.length} / ${VPS_DEFINITIONS.length} Nodes Operational</span>
             </div>
             <div class="vps-subtitle">Physical Host Telemetry · vnStat Bandwidth · Aggregated Established TCP Sockets</div>
           </div>
