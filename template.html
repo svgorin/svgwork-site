@@ -497,6 +497,207 @@
       box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
     }
 
+    /* Telemetry & Stats Button */
+    .stats-btn {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.22);
+      color: #60a5fa;
+      padding: 0.45rem 0.6rem;
+      border-radius: 9px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      vertical-align: middle;
+    }
+
+    .stats-btn:hover {
+      background: rgba(59, 130, 246, 0.22);
+      border-color: #3b82f6;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .socket-pill {
+      background: rgba(16, 185, 129, 0.22);
+      color: #34d399;
+      border-radius: 10px;
+      padding: 0.1rem 0.35rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 15, 25, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 520px;
+      padding: 1.75rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.15);
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-backdrop.active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .modal-icon {
+      font-size: 32px;
+      color: #3b82f6;
+      background: rgba(59, 130, 246, 0.12);
+      padding: 0.5rem;
+      border-radius: 12px;
+    }
+
+    .modal-title-group h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .modal-title-group p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .modal-close-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .metric-card {
+      background: rgba(25, 33, 53, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .metric-header {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .metric-header .material-symbols-outlined {
+      font-size: 18px;
+    }
+
+    .metric-header .speed-icon { color: #60a5fa; }
+    .metric-header .sockets-icon { color: #34d399; }
+    .metric-header .peak-icon { color: #f59e0b; }
+    .metric-header .total-icon { color: #a78bfa; }
+
+    .metric-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .metric-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-sub {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 1rem;
+    }
+
     .toast {
       position: fixed;
       bottom: 2.5rem;
@@ -751,5 +952,7 @@
       });
     }
   </script>
+  <!-- STATS_MODAL_PLACEHOLDER -->
+  <!-- STATS_SCRIPT_PLACEHOLDER -->
 </body>
 </html>

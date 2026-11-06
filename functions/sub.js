@@ -15,7 +15,7 @@ export async function onRequest(context) {
     });
   }
 
-                                                                                                                    // 2. Define your node URLs (one per line)
+                                                                                                                      // 2. Define your node URLs (one per line)
   const nodeLinks = [
     "vless://57825bae-1d76-4be6-81ac-944734401557@176.114.78.170:51732?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=seltel2.svgrn.work&pbk=vv6X-N1qDE6hsW4Av3MdVneqCQztAQzdY1qxfSQZ-yA&sid=809ee562267e7965#SELTEL-REALITY",
     "vless://f3ac9b0f-c194-4e3f-ac80-17957eac3dff@176.114.78.170:443?encryption=none&type=tcp&security=tls&sni=seltel.svgrn.work&fp=chrome#seltel443",

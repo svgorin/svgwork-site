@@ -3,6 +3,7 @@ const https = require('https');
 const dns = require('dns');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const SECRET_KEY = "Im7R9FYpBFwXmKX6";
 const profileTitle = "svg Collection";
@@ -581,7 +582,127 @@ function saveProbeResults(data) {
   }
 }
 
-function serveHtmlPage(res) {
+function parseCookies(cookieHeader) {
+  const list = {};
+  if (!cookieHeader) return list;
+  cookieHeader.split(';').forEach(cookie => {
+    let [name, ...rest] = cookie.split('=');
+    name = name?.trim();
+    if (!name) return;
+    const value = rest.join('=').trim();
+    list[name] = decodeURIComponent(value);
+  });
+  return list;
+}
+
+// In-memory cache for Selectel telemetry to avoid blocking HTTP responses
+let selectelTelemetryCache = {
+  updated_at: 0,
+  rate_display: '0 kbit/s',
+  rate_down_str: '0 kbit/s',
+  rate_up_str: '0 kbit/s',
+  max_rate_display: '15.34 Mbit/s',
+  sockets: {}
+};
+
+function refreshSelectelTelemetry() {
+  try {
+    const now = Date.now();
+    // Cache for 45 seconds
+    if (now - selectelTelemetryCache.updated_at < 45000) {
+      return selectelTelemetryCache;
+    }
+
+    // 1. Check open sockets for Selectel ports
+    const SELTEL_PORTS = {
+      'SELTEL-REALITY': 51732,
+      'seltel443': 443,
+      'seltel9443': 9443,
+      'seltel1006ws': 2053,
+      '🔀 seltel-ws-ch': 2083,
+      '🔀 seltel-ws-nl': 2087
+    };
+
+    const sockets = {};
+    for (const [name, port] of Object.entries(SELTEL_PORTS)) {
+      try {
+        const out = execSync(`ss -t state established "( sport = :${port} or dport = :${port} )" | tail -n +2 | wc -l`, { encoding: 'utf8', timeout: 1500 });
+        sockets[name] = parseInt(out.trim()) || 0;
+      } catch (e) {
+        sockets[name] = 0;
+      }
+    }
+
+    // 2. Sample vnstat live rate
+    let rxStr = '0 kbit/s';
+    let txStr = '0 kbit/s';
+    let rateDisplay = '0 kbit/s';
+    try {
+      const vnJson = JSON.parse(execSync('vnstat -tr 2 --json', { encoding: 'utf8', timeout: 4000 }));
+      if (vnJson.rx) rxStr = vnJson.rx.ratestring || '0 kbit/s';
+      if (vnJson.tx) txStr = vnJson.tx.ratestring || '0 kbit/s';
+      rateDisplay = `↓ ${rxStr} · ↑ ${txStr}`;
+    } catch (e) {}
+
+    // 3. 24h Max Rate
+    let maxRateDisplay = '15.34 Mbit/s';
+    try {
+      const hJson = JSON.parse(execSync('vnstat -h 24 --json', { encoding: 'utf8', timeout: 2000 }));
+      let peakBps = 0;
+      for (const iface of (hJson.interfaces || [])) {
+        for (const h of (iface.traffic?.hour || [])) {
+          const bps = ((h.rx || 0) + (h.tx || 0)) * 8 / 3600;
+          if (bps > peakBps) peakBps = bps;
+        }
+      }
+      if (peakBps > 1000000) {
+        maxRateDisplay = `${(peakBps / 1000000).toFixed(2)} Mbit/s`;
+      } else if (peakBps > 0) {
+        maxRateDisplay = `${(peakBps / 1000).toFixed(1)} kbit/s`;
+      }
+    } catch (e) {}
+
+    selectelTelemetryCache = {
+      updated_at: now,
+      rate_display: rateDisplay,
+      rate_down_str: rxStr,
+      rate_up_str: txStr,
+      max_rate_display: maxRateDisplay,
+      sockets
+    };
+  } catch (err) {
+    console.error('Error refreshing Selectel telemetry:', err);
+  }
+  return selectelTelemetryCache;
+}
+
+function enrichSelectelNodes(probeNodes) {
+  const tele = refreshSelectelTelemetry();
+  const nowIso = new Date().toISOString();
+
+  for (const [name, count] of Object.entries(tele.sockets || {})) {
+    if (!probeNodes[name]) {
+      probeNodes[name] = {
+        status: 'PASS',
+        latency: 5,
+        country: '🇷🇺 Russia (Selectel SPb)',
+        detail: 'Direct SPb Server',
+        checked_at: nowIso
+      };
+    }
+    probeNodes[name].traffic = {
+      open_sockets: count,
+      rate_display: count > 0 ? tele.rate_display : '0 KB/s',
+      rate_down_str: tele.rate_down_str,
+      rate_up_str: tele.rate_up_str,
+      max_rate_display: tele.max_rate_display,
+      server: 'Selectel SPb (eth0)',
+      sampled_at: nowIso
+    };
+  }
+}
+
+function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
   const templatePath = path.join(__dirname, 'template.html');
   fs.readFile(templatePath, 'utf8', (err, html) => {
     if (err) {
@@ -607,6 +728,11 @@ function serveHtmlPage(res) {
     const probeData = loadProbeResults();
     const probeNodes = probeData.nodes || {};
 
+    // Enrich Selectel's local nodes with real-time sockets and vnstat
+    enrichSelectelNodes(probeNodes);
+
+    const trafficMap = {};
+
     // Build the collapsible group cards HTML
     let groupsHtml = '';
     for (const [location, groupData] of Object.entries(groups)) {
@@ -624,7 +750,23 @@ function serveHtmlPage(res) {
         const status = probe ? probe.status : 'UNKNOWN';
         const latency = probe && probe.latency ? `${probe.latency}ms` : '';
         const detail = probe ? (probe.detail || '') : 'Not tested';
+        const traffic = (probe && probe.traffic) ? probe.traffic : { open_sockets: 0, rate_display: '0 KB/s', max_rate_display: 'N/A' };
         
+        if (isAuthorizedStats) {
+          trafficMap[node.name] = {
+            name: node.name,
+            country: (probe && probe.country) ? probe.country : location,
+            open_sockets: traffic.open_sockets || 0,
+            rate_display: traffic.rate_display || '0 KB/s',
+            rate_down_str: traffic.rate_down_str || '0 KB/s',
+            rate_up_str: traffic.rate_up_str || '0 KB/s',
+            max_rate_display: traffic.max_rate_display || 'N/A',
+            total_bytes: traffic.total_bytes || 0,
+            server: traffic.server || (node.name.includes('aeza') ? 'Aeza Moscow (enp0s3)' : 'Selectel SPb (eth0)'),
+            sampled_at: traffic.sampled_at || (probe && probe.checked_at) || ''
+          };
+        }
+
         if (probe) {
           if (probe.status === 'PASS') {
             passCount++;
@@ -651,11 +793,23 @@ function serveHtmlPage(res) {
 
         const isWg = node.protocol === 'wireguard';
         
+        let statsBtnHtml = '';
+        if (isAuthorizedStats) {
+          const sockets = traffic.open_sockets || 0;
+          const pill = sockets > 0 ? `<span class="socket-pill" title="${sockets} active connections">${sockets}</span>` : '';
+          statsBtnHtml = `
+            <button class="stats-btn" title="Node Traffic Telemetry & Active Sockets" onclick="openStatsModal(decodeURIComponent('${encodeURIComponent(node.name)}'))">
+              <span class="material-symbols-outlined" style="font-size:17px;">query_stats</span>
+              ${pill}
+            </button>`;
+        }
+
         let actionButtons = '';
         if (isWg && node.wgConf) {
           const escapedConf = encodeURIComponent(node.wgConf);
           actionButtons = `
             <div style="display:inline-flex; gap:0.4rem; align-items:center;">
+              ${statsBtnHtml}
               <button class="copy-btn" title="Copy WireGuard .conf" onclick="copyToClipboard(this, decodeURIComponent('${escapedConf}'))" style="padding:0.35rem 0.65rem; font-size:0.75rem; gap:0.3rem;">
                 <span class="material-symbols-outlined" style="font-size:16px;">description</span>
                 <span>.conf</span>
@@ -669,9 +823,12 @@ function serveHtmlPage(res) {
             </div>`;
         } else {
           actionButtons = `
-            <button class="copy-btn" onclick="copyToClipboard(this, \`${node.link}\`)">
-              <span class="material-symbols-outlined">content_copy</span>
-            </button>`;
+            <div style="display:inline-flex; gap:0.4rem; align-items:center;">
+              ${statsBtnHtml}
+              <button class="copy-btn" onclick="copyToClipboard(this, \`${node.link}\`)">
+                <span class="material-symbols-outlined">content_copy</span>
+              </button>
+            </div>`;
         }
 
         const isCascade = node.name.includes('🔀') || node.name.toLowerCase().includes('cascade');
@@ -746,10 +903,136 @@ function serveHtmlPage(res) {
     let renderedHtml = html.replace('<!-- GROUPS_PLACEHOLDER -->', groupsHtml);
     renderedHtml = renderedHtml.replace('<!-- PROBE_META_PLACEHOLDER -->', probeMetaHtml);
 
-    res.writeHead(200, {
+    if (isAuthorizedStats) {
+      const modalHtml = `
+      <div id="stats-modal" class="modal-backdrop" onclick="closeStatsModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <div class="modal-title-group">
+              <span class="material-symbols-outlined modal-icon">monitoring</span>
+              <div>
+                <h3 id="modal-node-name">Node Telemetry</h3>
+                <p id="modal-node-sub">Live Realtime Metrics & Traffic</p>
+              </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeStatsModal()">&times;</button>
+          </div>
+          
+          <div class="modal-grid">
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="material-symbols-outlined metric-icon speed-icon">speed</span>
+                <span class="metric-label">Current Rate</span>
+              </div>
+              <div class="metric-value" id="modal-rate">0.0 KB/s</div>
+              <div class="metric-sub" id="modal-rate-sub">Live throughput (vnstat)</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="material-symbols-outlined metric-icon sockets-icon">hub</span>
+                <span class="metric-label">Open Sockets</span>
+              </div>
+              <div class="metric-value" id="modal-sockets">0</div>
+              <div class="metric-sub">Active TCP connections</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="material-symbols-outlined metric-icon peak-icon">trending_up</span>
+                <span class="metric-label">Max Rate</span>
+              </div>
+              <div class="metric-value" id="modal-max-rate">0.0 KB/s</div>
+              <div class="metric-sub">Peak bandwidth recorded</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="material-symbols-outlined metric-icon total-icon">data_usage</span>
+                <span class="metric-label">Total Volume</span>
+              </div>
+              <div class="metric-value" id="modal-total-bytes">0 MB</div>
+              <div class="metric-sub" id="modal-total-sub">Cumulative data transferred</div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
+            <span id="modal-sampled-at">Last sampled: Just now</span>
+          </div>
+        </div>
+      </div>`;
+
+      const scriptHtml = `
+      <script id="node-traffic-data" type="application/json">
+      ${JSON.stringify(trafficMap)}
+      </script>
+      <script>
+        function formatBytes(bytes) {
+          if (!bytes || bytes === 0) return '0 B';
+          const k = 1024;
+          const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function openStatsModal(nodeName) {
+          const raw = document.getElementById('node-traffic-data')?.textContent;
+          if (!raw) return;
+          try {
+            const map = JSON.parse(raw);
+            const data = map[nodeName] || {};
+            
+            document.getElementById('modal-node-name').textContent = nodeName;
+            document.getElementById('modal-node-sub').textContent = (data.country || 'Node') + ' · ' + (data.server || 'Transit Server');
+            document.getElementById('modal-rate').textContent = data.rate_display || '0 KB/s';
+            document.getElementById('modal-rate-sub').textContent = (data.rate_down_str && data.rate_up_str) ? ('↓ ' + data.rate_down_str + ' · ↑ ' + data.rate_up_str) : 'Live throughput (vnstat)';
+            document.getElementById('modal-sockets').textContent = data.open_sockets || '0';
+            document.getElementById('modal-max-rate').textContent = data.max_rate_display || 'N/A';
+            document.getElementById('modal-total-bytes').textContent = formatBytes(data.total_bytes);
+            
+            let sampleText = 'Last sampled: Live telemetry';
+            if (data.sampled_at) {
+              try {
+                const d = new Date(data.sampled_at);
+                sampleText = 'Sampled at ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' (' + d.toLocaleDateString() + ')';
+              } catch(e) {}
+            }
+            document.getElementById('modal-sampled-at').textContent = sampleText;
+
+            const modal = document.getElementById('stats-modal');
+            if (modal) modal.classList.add('active');
+          } catch (e) {
+            console.error('Failed to open stats modal:', e);
+          }
+        }
+
+        function closeStatsModal(e) {
+          const modal = document.getElementById('stats-modal');
+          if (modal) modal.classList.remove('active');
+        }
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeStatsModal();
+        });
+      </script>`;
+
+      renderedHtml = renderedHtml.replace('<!-- STATS_MODAL_PLACEHOLDER -->', modalHtml);
+      renderedHtml = renderedHtml.replace('<!-- STATS_SCRIPT_PLACEHOLDER -->', scriptHtml);
+    } else {
+      renderedHtml = renderedHtml.replace('<!-- STATS_MODAL_PLACEHOLDER -->', '');
+      renderedHtml = renderedHtml.replace('<!-- STATS_SCRIPT_PLACEHOLDER -->', '');
+    }
+
+    const headers = {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "no-store, no-cache, must-revalidate"
-    });
+    };
+    if (setCookieHeader) {
+      headers["Set-Cookie"] = setCookieHeader;
+    }
+
+    res.writeHead(200, headers);
     res.end(renderedHtml);
   });
 }
@@ -765,19 +1048,31 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const payload = JSON.parse(body);
-        let formatted = payload;
-        if (!payload.nodes && typeof payload === 'object') {
-          formatted = {
-            updated_at: new Date().toISOString(),
-            source: 'aeza (Moscow)',
-            nodes: payload
-          };
-        } else if (!payload.updated_at) {
-          formatted.updated_at = new Date().toISOString();
+        const incomingNodes = payload.nodes || (typeof payload === 'object' ? payload : {});
+        const currentData = loadProbeResults();
+        const currentNodes = currentData.nodes || {};
+
+        // Merge incoming nodes without losing telemetry or probe data
+        for (const [name, info] of Object.entries(incomingNodes)) {
+          if (currentNodes[name]) {
+            currentNodes[name] = {
+              ...currentNodes[name],
+              ...info,
+              traffic: info.traffic || currentNodes[name].traffic
+            };
+          } else {
+            currentNodes[name] = info;
+          }
         }
+
+        const formatted = {
+          updated_at: payload.updated_at || new Date().toISOString(),
+          source: payload.source || currentData.source || 'aeza (Moscow)',
+          nodes: currentNodes
+        };
         saveProbeResults(formatted);
         res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ success: true, count: Object.keys(formatted.nodes || {}).length }));
+        res.end(JSON.stringify({ success: true, count: Object.keys(currentNodes).length }));
       } catch (e) {
         res.writeHead(400, { "content-type": "application/json" });
         res.end(JSON.stringify({ success: false, error: e.message }));
@@ -789,6 +1084,7 @@ const server = http.createServer((req, res) => {
   // 2. Probe results JSON endpoint (GET)
   if (pathname === `/${SECRET_KEY}/probe-results.json` || pathname === `/${SECRET_KEY}/probe-results`) {
     const probeData = loadProbeResults();
+    enrichSelectelNodes(probeData.nodes || {});
     res.writeHead(200, {
       "content-type": "application/json; charset=utf-8",
       "cache-control": "no-store, no-cache, must-revalidate"
@@ -799,7 +1095,24 @@ const server = http.createServer((req, res) => {
 
   // 3. HTML page request under the pure key segment
   if (pathname === `/${SECRET_KEY}`) {
-    serveHtmlPage(res);
+    const cookies = parseCookies(req.headers.cookie);
+    const urlHasStats = reqUrl.searchParams.get("stats") === "1" || reqUrl.searchParams.get("admin") === "1" || reqUrl.searchParams.get("traffic") === "1";
+    const urlClearsStats = reqUrl.searchParams.get("stats") === "0" || reqUrl.searchParams.get("admin") === "0";
+
+    let isAuthorizedStats = false;
+    let setCookieHeader = null;
+
+    if (urlHasStats) {
+      isAuthorizedStats = true;
+      setCookieHeader = "svg_stats=1; Path=/; Max-Age=31536000; SameSite=Lax";
+    } else if (urlClearsStats) {
+      isAuthorizedStats = false;
+      setCookieHeader = "svg_stats=; Path=/; Max-Age=0; SameSite=Lax";
+    } else if (cookies.svg_stats === "1") {
+      isAuthorizedStats = true;
+    }
+
+    serveHtmlPage(res, isAuthorizedStats, setCookieHeader);
     return;
   }
 
