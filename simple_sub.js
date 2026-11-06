@@ -595,13 +595,69 @@ function parseCookies(cookieHeader) {
   return list;
 }
 
+function parseRateToBps(str) {
+  if (!str) return 0;
+  const m = str.match(/([0-9.]+)\s*([a-zA-Z/]+)/);
+  if (!m) return 0;
+  const val = parseFloat(m[1]);
+  if (isNaN(val) || val <= 0) return 0;
+  const unit = m[2].toLowerCase();
+  if (unit.includes('gibit') || unit.includes('gib/s')) return (val * 1024 * 1024 * 1024) / (unit.includes('bit') ? 8 : 1);
+  if (unit.includes('mibit') || unit.includes('mib/s')) return (val * 1024 * 1024) / (unit.includes('bit') ? 8 : 1);
+  if (unit.includes('kibit') || unit.includes('kib/s')) return (val * 1024) / (unit.includes('bit') ? 8 : 1);
+  if (unit.includes('gbit')) return (val * 1000 * 1000 * 1000) / 8;
+  if (unit.includes('mbit')) return (val * 1000 * 1000) / 8;
+  if (unit.includes('kbit')) return (val * 1000) / 8;
+  if (unit.includes('gb/s') || unit.includes('gbyte')) return val * 1024 * 1024 * 1024;
+  if (unit.includes('mb/s') || unit.includes('mbyte')) return val * 1024 * 1024;
+  if (unit.includes('kb/s') || unit.includes('kbyte')) return val * 1024;
+  if (unit.includes('bit/s')) return val / 8;
+  if (unit.includes('b/s')) return val;
+  return val;
+}
+
+function formatBps(bps) {
+  if (!bps || bps <= 0) return '0 KB/s';
+  if (bps >= 1024 * 1024 * 1024) return (bps / (1024 * 1024 * 1024)).toFixed(2) + ' GB/s';
+  if (bps >= 1024 * 1024) return (bps / (1024 * 1024)).toFixed(2) + ' MB/s';
+  if (bps >= 1024) return (bps / 1024).toFixed(2) + ' KB/s';
+  return Math.round(bps) + ' B/s';
+}
+
+function normalizeRateToBytes(str) {
+  if (!str) return '0 KB/s';
+  if (str === 'N/A') return 'N/A';
+  if (str === '0 KB/s' || str === '0 kbit/s' || str === '0 B/s' || str === '0.0 KB/s') {
+    return '0 KB/s';
+  }
+  let rxStr = null;
+  let txStr = null;
+  if (str.includes('down') && str.includes('up')) {
+    const rxM = str.match(/([0-9.]+\s*[a-zA-Z/]+)\s*down/i);
+    const txM = str.match(/([0-9.]+\s*[a-zA-Z/]+)\s*up/i);
+    if (rxM) rxStr = rxM[1];
+    if (txM) txStr = txM[1];
+  } else if (str.includes('↓') || str.includes('↑')) {
+    const rxM = str.match(/↓\s*([0-9.]+\s*[a-zA-Z/]+)/i);
+    const txM = str.match(/↑\s*([0-9.]+\s*[a-zA-Z/]+)/i);
+    if (rxM) rxStr = rxM[1];
+    if (txM) txStr = txM[1];
+  }
+  if (rxStr || txStr) {
+    const rxBps = parseRateToBps(rxStr);
+    const txBps = parseRateToBps(txStr);
+    return `↓ ${formatBps(rxBps)} · ↑ ${formatBps(txBps)}`;
+  }
+  return formatBps(parseRateToBps(str));
+}
+
 // In-memory cache for Selectel telemetry to avoid blocking HTTP responses
 let selectelTelemetryCache = {
   updated_at: 0,
-  rate_display: '0 kbit/s',
-  rate_down_str: '0 kbit/s',
-  rate_up_str: '0 kbit/s',
-  max_rate_display: '15.34 Mbit/s',
+  rate_display: '0 KB/s',
+  rate_down_str: '0 KB/s',
+  rate_up_str: '0 KB/s',
+  max_rate_display: '0 KB/s',
   sockets: {}
 };
 
@@ -634,32 +690,34 @@ function refreshSelectelTelemetry() {
     }
 
     // 2. Sample vnstat live rate
-    let rxStr = '0 kbit/s';
-    let txStr = '0 kbit/s';
-    let rateDisplay = '0 kbit/s';
+    let rxStr = '0 KB/s';
+    let txStr = '0 KB/s';
+    let rateDisplay = '0 KB/s';
     try {
       const vnJson = JSON.parse(execSync('vnstat -tr 2 --json', { encoding: 'utf8', timeout: 4000 }));
-      if (vnJson.rx) rxStr = vnJson.rx.ratestring || '0 kbit/s';
-      if (vnJson.tx) txStr = vnJson.tx.ratestring || '0 kbit/s';
+      if (vnJson.rx) {
+        const rxBps = vnJson.rx.bytespersecond || parseRateToBps(vnJson.rx.ratestring);
+        rxStr = formatBps(rxBps);
+      }
+      if (vnJson.tx) {
+        const txBps = vnJson.tx.bytespersecond || parseRateToBps(vnJson.tx.ratestring);
+        txStr = formatBps(txBps);
+      }
       rateDisplay = `↓ ${rxStr} · ↑ ${txStr}`;
     } catch (e) {}
 
     // 3. 24h Max Rate
-    let maxRateDisplay = '15.34 Mbit/s';
+    let maxRateDisplay = '0 KB/s';
     try {
       const hJson = JSON.parse(execSync('vnstat -h 24 --json', { encoding: 'utf8', timeout: 2000 }));
       let peakBps = 0;
       for (const iface of (hJson.interfaces || [])) {
         for (const h of (iface.traffic?.hour || [])) {
-          const bps = ((h.rx || 0) + (h.tx || 0)) * 8 / 3600;
+          const bps = ((h.rx || 0) + (h.tx || 0)) / 3600;
           if (bps > peakBps) peakBps = bps;
         }
       }
-      if (peakBps > 1000000) {
-        maxRateDisplay = `${(peakBps / 1000000).toFixed(2)} Mbit/s`;
-      } else if (peakBps > 0) {
-        maxRateDisplay = `${(peakBps / 1000).toFixed(1)} kbit/s`;
-      }
+      maxRateDisplay = formatBps(peakBps);
     } catch (e) {}
 
     selectelTelemetryCache = {
@@ -822,11 +880,11 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
           </div>
         </td>
         <td>
-          <div class="vps-rate-val">${rateDisplay}</div>
+          <div class="vps-rate-val">${normalizeRateToBytes(rateDisplay)}</div>
           <div class="vps-rate-sub">vnStat Live Throughput</div>
         </td>
         <td>
-          <div class="vps-rate-val">${maxRateDisplay}</div>
+          <div class="vps-rate-val">${normalizeRateToBytes(maxRateDisplay)}</div>
           <div class="vps-rate-sub">24h Peak Recorded</div>
         </td>
         <td style="max-width:380px;">
@@ -919,6 +977,16 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
     const probeData = loadProbeResults();
     const probeNodes = probeData.nodes || {};
 
+    // Normalize any cached traffic telemetry in probeNodes to consistent KB/s or MB/s
+    for (const info of Object.values(probeNodes)) {
+      if (info && info.traffic) {
+        if (info.traffic.rate_display) info.traffic.rate_display = normalizeRateToBytes(info.traffic.rate_display);
+        if (info.traffic.rate_down_str) info.traffic.rate_down_str = normalizeRateToBytes(info.traffic.rate_down_str);
+        if (info.traffic.rate_up_str) info.traffic.rate_up_str = normalizeRateToBytes(info.traffic.rate_up_str);
+        if (info.traffic.max_rate_display) info.traffic.max_rate_display = normalizeRateToBytes(info.traffic.max_rate_display);
+      }
+    }
+
     // Enrich Selectel's local nodes with real-time sockets and vnstat
     enrichSelectelNodes(probeNodes);
 
@@ -948,10 +1016,10 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
             name: node.name,
             country: (probe && probe.country) ? probe.country : location,
             open_sockets: traffic.open_sockets || 0,
-            rate_display: traffic.rate_display || '0 KB/s',
-            rate_down_str: traffic.rate_down_str || '0 KB/s',
-            rate_up_str: traffic.rate_up_str || '0 KB/s',
-            max_rate_display: traffic.max_rate_display || 'N/A',
+            rate_display: normalizeRateToBytes(traffic.rate_display || '0 KB/s'),
+            rate_down_str: normalizeRateToBytes(traffic.rate_down_str || '0 KB/s'),
+            rate_up_str: normalizeRateToBytes(traffic.rate_up_str || '0 KB/s'),
+            max_rate_display: normalizeRateToBytes(traffic.max_rate_display || 'N/A'),
             total_bytes: traffic.total_bytes || 0,
             server: traffic.server || (node.name.includes('aeza') ? 'Aeza Moscow (enp0s3)' : 'Selectel SPb (eth0)'),
             sampled_at: traffic.sampled_at || (probe && probe.checked_at) || ''
@@ -1179,8 +1247,15 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
             
             document.getElementById('modal-node-name').textContent = nodeName;
             document.getElementById('modal-node-sub').textContent = (data.country || 'Node') + ' · ' + (data.server || 'Transit Server');
-            document.getElementById('modal-rate').textContent = data.rate_display || '0 KB/s';
-            document.getElementById('modal-rate-sub').textContent = (data.rate_down_str && data.rate_up_str) ? ('↓ ' + data.rate_down_str + ' · ↑ ' + data.rate_up_str) : 'Live throughput (vnstat)';
+            const rateDisp = data.rate_display || '0 KB/s';
+            document.getElementById('modal-rate').textContent = rateDisp;
+            if (rateDisp.includes('↓') || rateDisp.includes('↑')) {
+              document.getElementById('modal-rate-sub').textContent = 'Live throughput (vnstat)';
+            } else if (data.rate_down_str && data.rate_up_str && (data.rate_down_str !== '0 KB/s' || data.rate_up_str !== '0 KB/s')) {
+              document.getElementById('modal-rate-sub').textContent = '↓ ' + data.rate_down_str + ' · ↑ ' + data.rate_up_str;
+            } else {
+              document.getElementById('modal-rate-sub').textContent = 'Live throughput (vnstat)';
+            }
             document.getElementById('modal-sockets').textContent = data.open_sockets || '0';
             document.getElementById('modal-max-rate').textContent = data.max_rate_display || 'N/A';
             document.getElementById('modal-total-bytes').textContent = formatBytes(data.total_bytes);
@@ -1249,6 +1324,12 @@ const server = http.createServer((req, res) => {
 
         // Merge incoming nodes without losing telemetry or probe data
         for (const [name, info] of Object.entries(incomingNodes)) {
+          if (info && info.traffic) {
+            if (info.traffic.rate_display) info.traffic.rate_display = normalizeRateToBytes(info.traffic.rate_display);
+            if (info.traffic.rate_down_str) info.traffic.rate_down_str = normalizeRateToBytes(info.traffic.rate_down_str);
+            if (info.traffic.rate_up_str) info.traffic.rate_up_str = normalizeRateToBytes(info.traffic.rate_up_str);
+            if (info.traffic.max_rate_display) info.traffic.max_rate_display = normalizeRateToBytes(info.traffic.max_rate_display);
+          }
           if (currentNodes[name]) {
             currentNodes[name] = {
               ...currentNodes[name],
@@ -1280,6 +1361,14 @@ const server = http.createServer((req, res) => {
   if (pathname === `/${SECRET_KEY}/probe-results.json` || pathname === `/${SECRET_KEY}/probe-results`) {
     const probeData = loadProbeResults();
     enrichSelectelNodes(probeData.nodes || {});
+    for (const info of Object.values(probeData.nodes || {})) {
+      if (info && info.traffic) {
+        if (info.traffic.rate_display) info.traffic.rate_display = normalizeRateToBytes(info.traffic.rate_display);
+        if (info.traffic.rate_down_str) info.traffic.rate_down_str = normalizeRateToBytes(info.traffic.rate_down_str);
+        if (info.traffic.rate_up_str) info.traffic.rate_up_str = normalizeRateToBytes(info.traffic.rate_up_str);
+        if (info.traffic.max_rate_display) info.traffic.max_rate_display = normalizeRateToBytes(info.traffic.max_rate_display);
+      }
+    }
     res.writeHead(200, {
       "content-type": "application/json; charset=utf-8",
       "cache-control": "no-store, no-cache, must-revalidate"
