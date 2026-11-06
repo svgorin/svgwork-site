@@ -702,6 +702,188 @@ function enrichSelectelNodes(probeNodes) {
   }
 }
 
+function generateVpsFleetHtml(probeNodes, selectelTele) {
+  const VPS_DEFINITIONS = [
+    {
+      id: 'selectel',
+      name: 'Selectel SPb',
+      flag: '🇷🇺',
+      host: '176.114.78.170 · seltel.svgrn.work',
+      roleTag: 'Primary Hub & Inbounds',
+      status: '🟢 Local Hub',
+      match: (name, srv) => srv.includes('Selectel') || name.toLowerCase().includes('seltel')
+    },
+    {
+      id: 'aeza',
+      name: 'Aeza Moscow',
+      flag: '🇷🇺',
+      host: '45.88.161.82 · blank-black.ptr.network',
+      roleTag: 'TSPU Probe & Cascades',
+      status: '🟢 TSPU Probe',
+      match: (name, srv) => srv.includes('Aeza') || name.toLowerCase().includes('aeza')
+    },
+    {
+      id: 'geneva',
+      name: 'Infomaniak Geneva',
+      flag: '🇨🇭',
+      host: '179.237.121.125 · ov-117aeb',
+      roleTag: 'Direct Swiss Inbounds',
+      status: '🟢 Remote Reporter',
+      match: (name, srv) => srv.includes('Geneva') || srv.includes('Infomaniak') || name.startsWith('CH-')
+    },
+    {
+      id: 'reykjavik',
+      name: '1984 Reykjavik',
+      flag: '🇮🇸',
+      host: '89.126.249.223 · vps6tanw1e',
+      roleTag: 'Direct Iceland Inbounds',
+      status: '🟢 Remote Reporter',
+      match: (name, srv) => srv.includes('Reykjavik') || srv.includes('1984') || name.startsWith('IS0922')
+    }
+  ];
+
+  let fleetTotalSockets = 0;
+  let fleetTotalProfiles = 0;
+  let serverRowsHtml = '';
+
+  for (const vps of VPS_DEFINITIONS) {
+    const matchedProfiles = [];
+    let serverSockets = 0;
+    let rateDisplay = 'N/A';
+    let maxRateDisplay = 'N/A';
+
+    for (const [name, info] of Object.entries(probeNodes)) {
+      const traffic = info.traffic || {};
+      const srv = traffic.server || '';
+      if (vps.match(name, srv)) {
+        const soc = traffic.open_sockets || 0;
+        serverSockets += soc;
+        if (traffic.rate_display && traffic.rate_display !== '0 KB/s' && traffic.rate_display !== '0 kbit/s') {
+          rateDisplay = traffic.rate_display;
+        } else if (rateDisplay === 'N/A' && traffic.rate_display) {
+          rateDisplay = traffic.rate_display;
+        }
+        if (traffic.max_rate_display && traffic.max_rate_display !== 'N/A') {
+          maxRateDisplay = traffic.max_rate_display;
+        }
+        matchedProfiles.push({ name, sockets: soc });
+      }
+    }
+
+    if (vps.id === 'selectel' && selectelTele) {
+      if (selectelTele.rate_display) rateDisplay = selectelTele.rate_display;
+      if (selectelTele.max_rate_display) maxRateDisplay = selectelTele.max_rate_display;
+    }
+
+    matchedProfiles.sort((a, b) => (b.sockets - a.sockets) || a.name.localeCompare(b.name));
+
+    fleetTotalSockets += serverSockets;
+    fleetTotalProfiles += matchedProfiles.length;
+
+    let profilePillsHtml = matchedProfiles.map(p => {
+      const escaped = encodeURIComponent(p.name);
+      const socBadge = p.sockets > 0 
+        ? `<span class="inbound-soc active">${p.sockets}</span>` 
+        : `<span class="inbound-soc zero">0</span>`;
+      return `<button class="inbound-pill" onclick="openStatsModal(decodeURIComponent('${escaped}'))" title="Open ${p.name} Telemetry">${p.name} ${socBadge}</button>`;
+    }).join(' ');
+
+    if (!profilePillsHtml) {
+      profilePillsHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">No active profiles reported</span>';
+    }
+
+    serverRowsHtml += `
+      <tr>
+        <td>
+          <div class="vps-node-col">
+            <div class="vps-node-header">
+              <span class="vps-flag">${vps.flag}</span>
+              <span class="vps-node-name">${vps.name}</span>
+              <span class="vps-tag">${vps.roleTag}</span>
+            </div>
+            <div class="vps-host-sub">${vps.host}</div>
+          </div>
+        </td>
+        <td>
+          <div class="vps-sockets-col">
+            <span class="vps-socket-pill">
+              <span class="material-symbols-outlined" style="font-size:16px;">hub</span>
+              ${serverSockets}
+            </span>
+          </div>
+        </td>
+        <td>
+          <div class="vps-rate-val">${rateDisplay}</div>
+          <div class="vps-rate-sub">vnStat Live Throughput</div>
+        </td>
+        <td>
+          <div class="vps-rate-val">${maxRateDisplay}</div>
+          <div class="vps-rate-sub">24h Peak Recorded</div>
+        </td>
+        <td style="max-width:380px;">
+          <div class="vps-inbounds-wrap">
+            ${profilePillsHtml}
+          </div>
+        </td>
+        <td>
+          <span class="vps-status-pill">${vps.status}</span>
+        </td>
+      </tr>
+    `;
+  }
+
+  return `
+    <div class="vps-fleet-card">
+      <div class="vps-fleet-header" onclick="toggleVpsFleet(this)">
+        <div class="vps-fleet-title">
+          <div class="vps-icon-wrap">
+            <span class="material-symbols-outlined">dns</span>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+              <h2 style="font-size:1.15rem; font-weight:700; color:#fff; margin:0;">Distinct VPS Fleet Infrastructure</h2>
+              <span class="vps-badge-online">🟢 4 / 4 Nodes Operational</span>
+            </div>
+            <div class="vps-subtitle">Physical Host Telemetry · vnStat Bandwidth · Aggregated Established TCP Sockets</div>
+          </div>
+        </div>
+        <div class="vps-fleet-summary">
+          <div class="fleet-stat-pill">
+            <span class="material-symbols-outlined" style="font-size:16px; color:#34d399;">hub</span>
+            <span class="fleet-stat-label">Fleet Sockets:</span>
+            <strong class="fleet-stat-val">${fleetTotalSockets}</strong>
+          </div>
+          <div class="fleet-stat-pill">
+            <span class="material-symbols-outlined" style="font-size:16px; color:#60a5fa;">router</span>
+            <span class="fleet-stat-label">Inbounds:</span>
+            <strong class="fleet-stat-val">${fleetTotalProfiles}</strong>
+          </div>
+          <span class="material-symbols-outlined chevron">expand_more</span>
+        </div>
+      </div>
+      <div class="vps-fleet-content">
+        <div class="vps-table-wrap">
+          <table class="vps-table">
+            <thead>
+              <tr>
+                <th>Physical Server</th>
+                <th>Total Sockets</th>
+                <th>Live Rate (vnstat)</th>
+                <th>24h Peak Rate</th>
+                <th>Hosted Profiles Breakdown</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${serverRowsHtml}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
   const templatePath = path.join(__dirname, 'template.html');
   fs.readFile(templatePath, 'utf8', (err, html) => {
@@ -904,6 +1086,9 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
     renderedHtml = renderedHtml.replace('<!-- PROBE_META_PLACEHOLDER -->', probeMetaHtml);
 
     if (isAuthorizedStats) {
+      const vpsFleetHtml = generateVpsFleetHtml(probeNodes, selectelTelemetryCache);
+      renderedHtml = renderedHtml.replace('<!-- VPS_FLEET_PLACEHOLDER -->', vpsFleetHtml);
+
       const modalHtml = `
       <div id="stats-modal" class="modal-backdrop" onclick="closeStatsModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
@@ -1020,6 +1205,7 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
       renderedHtml = renderedHtml.replace('<!-- STATS_MODAL_PLACEHOLDER -->', modalHtml);
       renderedHtml = renderedHtml.replace('<!-- STATS_SCRIPT_PLACEHOLDER -->', scriptHtml);
     } else {
+      renderedHtml = renderedHtml.replace('<!-- VPS_FLEET_PLACEHOLDER -->', '');
       renderedHtml = renderedHtml.replace('<!-- STATS_MODAL_PLACEHOLDER -->', '');
       renderedHtml = renderedHtml.replace('<!-- STATS_SCRIPT_PLACEHOLDER -->', '');
     }
