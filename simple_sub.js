@@ -778,7 +778,7 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
       host: '45.88.161.82 · blank-black.ptr.network',
       roleTag: 'TSPU Probe & Cascades',
       status: '🟢 TSPU Probe',
-      match: (name, srv) => (srv.includes('Aeza') || name.toLowerCase().includes('aeza')) && !name.toLowerCase().includes('-se')
+      match: (name, srv) => (srv.includes('Aeza') || name.toLowerCase().includes('aeza')) && !name.toLowerCase().includes('-se') && !name.toLowerCase().includes('-lv')
     },
     {
       id: 'stockholm',
@@ -796,7 +796,7 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
       host: '13.140.17.172 · veesp.svgrn.work',
       roleTag: 'Direct Baltic Inbounds & Exit',
       status: '🟢 Remote Reporter',
-      match: (name, srv) => (srv.includes('Latvia') || name.startsWith('LV0808') || (srv.includes('Veesp') && !srv.includes('Sweden') && !srv.includes('Stockholm')) || (name.toLowerCase().includes('veesp') && !name.toLowerCase().includes('veespse') && !name.toLowerCase().includes('-se')))
+      match: (name, srv) => (srv.includes('Latvia') || name.startsWith('LV0808') || name.toLowerCase().includes('-lv') || (srv.includes('Veesp') && !srv.includes('Sweden') && !srv.includes('Stockholm')) || (name.toLowerCase().includes('veesp') && !name.toLowerCase().includes('veespse') && !name.toLowerCase().includes('-se')))
     },
     {
       id: 'geneva',
