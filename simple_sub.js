@@ -778,7 +778,16 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
       host: '45.88.161.82 · blank-black.ptr.network',
       roleTag: 'TSPU Probe & Cascades',
       status: '🟢 TSPU Probe',
-      match: (name, srv) => srv.includes('Aeza') || name.toLowerCase().includes('aeza')
+      match: (name, srv) => (srv.includes('Aeza') || name.toLowerCase().includes('aeza')) && !name.toLowerCase().includes('-se')
+    },
+    {
+      id: 'stockholm',
+      name: 'AWS Stockholm',
+      flag: '🇸🇪',
+      host: '16.192.11.10 · ip-172-26-8-240',
+      roleTag: 'Direct SS2022 & Cascade Exit',
+      status: '🟢 Remote Reporter',
+      match: (name, srv) => srv.includes('Stockholm') || srv.includes('Sweden') || name.toLowerCase().includes('-se') || name.toLowerCase().includes('se0922') || name.toLowerCase().includes('stockholm')
     },
     {
       id: 'veesp-lv',
@@ -787,7 +796,7 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
       host: '13.140.17.172 · veesp.svgrn.work',
       roleTag: 'Direct Baltic Inbounds & Exit',
       status: '🟢 Remote Reporter',
-      match: (name, srv) => srv.includes('Veesp') || srv.includes('Latvia') || name.startsWith('LV0808') || name.toLowerCase().includes('veesp')
+      match: (name, srv) => (srv.includes('Latvia') || name.startsWith('LV0808') || (srv.includes('Veesp') && !srv.includes('Sweden') && !srv.includes('Stockholm')) || (name.toLowerCase().includes('veesp') && !name.toLowerCase().includes('veespse') && !name.toLowerCase().includes('-se')))
     },
     {
       id: 'geneva',
