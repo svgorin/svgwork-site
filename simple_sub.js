@@ -232,22 +232,7 @@ rule-providers:
     path: ./ruleset/ru-blocked-ip.yaml
 
 rules:
-  # 0. Bypass sensitive & abuse ports directly to client ISP (Zero VPS leak)
-  - DST-PORT,23,DIRECT
-  - DST-PORT,25,DIRECT
-  - DST-PORT,135,DIRECT
-  - DST-PORT,137,DIRECT
-  - DST-PORT,138,DIRECT
-  - DST-PORT,139,DIRECT
-  - DST-PORT,445,DIRECT
-  - DST-PORT,1433,DIRECT
-  - DST-PORT,1521,DIRECT
-  - DST-PORT,3306,DIRECT
-  - DST-PORT,5432,DIRECT
-  - DST-PORT,6379,DIRECT
-  - DST-PORT,27017,DIRECT
-
-  # 1. Telphin VoIP (Force Proxy)
+  # 0. Telphin VoIP (Force Proxy)
   - DOMAIN-SUFFIX,telphin.com,AUTO-ROUTE-PROXY
   - DOMAIN-SUFFIX,telphin.ru,AUTO-ROUTE-PROXY
   - IP-CIDR,46.229.220.0/22,AUTO-ROUTE-PROXY,no-resolve
@@ -320,10 +305,6 @@ function generateSingBoxJson(outbounds) {
         }
       ],
       rules: [
-        {
-          port: [23, 25, 135, 137, 138, 139, 445, 1433, 1521, 3306, 5432, 6379, 27017],
-          outbound: "direct"
-        },
         {
           domain_suffix: ["telphin.com", "telphin.ru"],
           ip_cidr: [
