@@ -1,4 +1,22 @@
 {
+  "twmsk.svgrn.work": {
+    "ip": "5.42.126.164",
+    "countryCode": "RU",
+    "countryName": "Russia",
+    "flag": "🇷🇺",
+    "provider": "Timeweb Cloud",
+    "subtitle": "🇷🇺 RU, Russia",
+    "testUrl": "https://twmsk.svgrn.work/"
+  },
+  "5.42.126.164": {
+    "ip": "5.42.126.164",
+    "countryCode": "RU",
+    "countryName": "Russia",
+    "flag": "🇷🇺",
+    "provider": "Timeweb Cloud",
+    "subtitle": "🇷🇺 RU, Russia",
+    "testUrl": "https://twmsk.svgrn.work/"
+  },
   "veesp-2.svgrn.work": {
     "ip": "13.140.17.172",
     "countryCode": "LV",

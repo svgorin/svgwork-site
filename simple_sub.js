@@ -413,6 +413,30 @@ function fetchIpInfoJson(ip) {
 }
 
 const CASCADE_EXITS = {
+  'twmsk-ws-nl': {
+    countryCode: 'NL',
+    countryName: 'Netherlands',
+    flag: '🇳🇱',
+    provider: 'Veesp Amsterdam',
+    subtitle: '🇳🇱 NL, Netherlands',
+    testUrl: 'https://veespnl.svgrn.work/'
+  },
+  'twmsk-ws-lv': {
+    countryCode: 'LV',
+    countryName: 'Latvia',
+    flag: '🇱🇻',
+    provider: 'Veesp Riga',
+    subtitle: '🇱🇻 LV, Latvia',
+    testUrl: 'https://veesp.svgrn.work/'
+  },
+  'twmsk-ws-ch': {
+    countryCode: 'CH',
+    countryName: 'Switzerland',
+    flag: '🇨🇭',
+    provider: 'Infomaniak Geneva',
+    subtitle: '🇨🇭 CH, Switzerland',
+    testUrl: 'https://infoman.svgrn.work/'
+  },
   'seltel-ws-ch': {
     countryCode: 'CH',
     countryName: 'Switzerland',
