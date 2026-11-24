@@ -429,6 +429,14 @@ const CASCADE_EXITS = {
     subtitle: '🇱🇻 LV, Latvia',
     testUrl: 'https://veesp.svgrn.work/'
   },
+  'twmsk-ws-se': {
+    countryCode: 'SE',
+    countryName: 'Sweden',
+    flag: '🇸🇪',
+    provider: 'AWS Stockholm',
+    subtitle: '🇸🇪 SE, Sweden',
+    testUrl: 'https://aws.amazon.com/'
+  },
   'twmsk-ws-ch': {
     countryCode: 'CH',
     countryName: 'Switzerland',
@@ -517,7 +525,7 @@ function getCascadeExitGeo(link, nodeName) {
   if (CASCADE_EXITS[cleanName]) return CASCADE_EXITS[cleanName];
   if (cleanName.endsWith('-ch')) return CASCADE_EXITS['seltel-ws-ch'];
   if (cleanName.endsWith('-nl')) return CASCADE_EXITS['seltel-ws-nl'];
-  if (cleanName.endsWith('-se')) return CASCADE_EXITS['aeza1010ws-se'];
+  if (cleanName.endsWith('-se')) return CASCADE_EXITS['twmsk-ws-se'] || CASCADE_EXITS['aeza1010ws-se'];
   if (cleanName.endsWith('-is')) return CASCADE_EXITS['aeza1010ws-is'];
   if (cleanName.endsWith('-lv')) return CASCADE_EXITS['aeza1010ws-lv'];
   if (cleanName.endsWith('-il')) return CASCADE_EXITS['aeza1010ws-il'];
