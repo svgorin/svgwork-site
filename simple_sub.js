@@ -445,6 +445,14 @@ const CASCADE_EXITS = {
     subtitle: '🇨🇭 CH, Switzerland',
     testUrl: 'https://infoman.svgrn.work/'
   },
+  'twmsk-ws-il': {
+    countryCode: 'IL',
+    countryName: 'Israel',
+    flag: '🇮🇱',
+    provider: 'Kamatera Petah Tiqva',
+    subtitle: '🇮🇱 IL, Israel',
+    testUrl: 'https://ifconfig.co/'
+  },
   'seltel-ws-ch': {
     countryCode: 'CH',
     countryName: 'Switzerland',
