@@ -12,6 +12,7 @@ module.exports = [
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:443?type=ws&security=tls&path=%2Fil-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-il",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:2096?type=ws&security=tls&path=%2Fse-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-se",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:2053?type=ws&security=tls&path=%2Fch-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-ch",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:443?type=ws&security=tls&path=%2Fpt-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-pt",
 
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?security=reality&encryption=none&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=cPYXCpebGrg2dgM60IXisBUfb_7p6JFdlZ0FJwDohUw&sni=is1984-2.svgrn.work&sid=428cdb76ec51db09#IS0922reality",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@89.126.249.223:443?type=xhttp&encryption=none&path=%2FT3LyARVh8q&host=is1984.svgrn.work&sni=is1984.svgrn.work&mode=packet-up&x_padding_bytes=100-1000&extra=%7B%22mode%22%3A%22packet-up%22%2C%22xPaddingBytes%22%3A%22100-1000%22%7D&security=tls#IS0922xhttp",

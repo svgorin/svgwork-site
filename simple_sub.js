@@ -453,6 +453,14 @@ const CASCADE_EXITS = {
     subtitle: '🇨🇭 CH, Switzerland',
     testUrl: 'https://infoman.svgrn.work/'
   },
+  'yc-ws-pt': {
+    countryCode: 'PT',
+    countryName: 'Portugal',
+    flag: '🇵🇹',
+    provider: 'Dominios PT Faro',
+    subtitle: '🇵🇹 PT, Portugal',
+    testUrl: 'https://ipinfo.io/'
+  },
   'seltel-ws-ch': {
     countryCode: 'CH',
     countryName: 'Switzerland',
@@ -532,6 +540,7 @@ function getCascadeExitGeo(link, nodeName) {
   const cleanName = name.replace(/^[\s\u200b\uFEFF🔀?]+/, '').trim();
   if (CASCADE_EXITS[cleanName]) return CASCADE_EXITS[cleanName];
   if (cleanName.endsWith('-ch')) return CASCADE_EXITS['seltel-ws-ch'];
+  if (cleanName.endsWith('-pt')) return CASCADE_EXITS['yc-ws-pt'];
   if (cleanName.endsWith('-nl')) return CASCADE_EXITS['seltel-ws-nl'];
   if (cleanName.endsWith('-se')) return CASCADE_EXITS['twmsk-ws-se'] || CASCADE_EXITS['aeza1010ws-se'];
   if (cleanName.endsWith('-is')) return CASCADE_EXITS['aeza1010ws-is'];
