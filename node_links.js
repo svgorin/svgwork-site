@@ -7,6 +7,12 @@ module.exports = [
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@176.114.78.170:2083?type=ws&security=tls&path=%2Fch-cascade%2Fws&host=seltel.svgrn.work&sni=seltel.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20seltel-ws-ch",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@176.114.78.170:2087?type=ws&security=tls&path=%2Fnl-cascade%2Fws&host=seltel.svgrn.work&sni=seltel.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20seltel-ws-nl",
 
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:2087?type=ws&security=tls&path=%2Fnl-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-nl",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:2083?type=ws&security=tls&path=%2Flv-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-lv",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:443?type=ws&security=tls&path=%2Fil-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-il",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:2096?type=ws&security=tls&path=%2Fse-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-se",
+  "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@yc.svgrn.work:2053?type=ws&security=tls&path=%2Fch-cascade%2Fws&host=yc.svgrn.work&sni=yc.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20yc-ws-ch",
+
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@twmsk.svgrn.work:2087?type=ws&security=tls&path=%2Fnl-cascade%2Fws&host=twmsk.svgrn.work&sni=twmsk.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20twmsk-ws-nl",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@twmsk.svgrn.work:2083?type=ws&security=tls&path=%2Flv-cascade%2Fws&host=twmsk.svgrn.work&sni=twmsk.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20twmsk-ws-lv",
   "vless://d1dcec4a-9f55-4073-b068-b1073d2f583d@twmsk.svgrn.work:2096?type=ws&security=tls&path=%2Fse-cascade%2Fws&host=twmsk.svgrn.work&sni=twmsk.svgrn.work&encryption=none&fp=firefox#%F0%9F%94%80%20twmsk-ws-se",
