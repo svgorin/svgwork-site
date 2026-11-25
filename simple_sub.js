@@ -453,6 +453,14 @@ const CASCADE_EXITS = {
     subtitle: '🇨🇭 CH, Switzerland',
     testUrl: 'https://infoman.svgrn.work/'
   },
+  'yc-ws-is': {
+    countryCode: 'IS',
+    countryName: 'Iceland',
+    flag: '🇮🇸',
+    provider: '1984 Hosting Reykjavik',
+    subtitle: '🇮🇸 IS, Iceland',
+    testUrl: 'https://is1984.svgrn.work/'
+  },
   'yc-ws-pt': {
     countryCode: 'PT',
     countryName: 'Portugal',
