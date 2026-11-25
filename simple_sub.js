@@ -1092,11 +1092,22 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
 
         let badgeHtml = '';
         if (status === 'PASS') {
-          badgeHtml = `<span class="probe-badge pass" title="${detail}"><span class="probe-dot pass"></span>PASS ${latency}</span>`;
+          badgeHtml = `<span class="probe-badge pass" title="Transit / Datacenter: ${detail}"><span class="probe-dot pass"></span>PASS ${latency}</span>`;
         } else if (status === 'FAIL') {
-          badgeHtml = `<span class="probe-badge fail" title="${detail}"><span class="probe-dot fail"></span>BLOCKED</span>`;
+          badgeHtml = `<span class="probe-badge fail" title="Transit / Datacenter: ${detail}"><span class="probe-dot fail"></span>BLOCKED</span>`;
         } else {
-          badgeHtml = `<span class="probe-badge unknown" title="${detail}"><span class="probe-dot unknown"></span>—</span>`;
+          badgeHtml = `<span class="probe-badge unknown" title="Transit / Datacenter: ${detail}"><span class="probe-dot unknown"></span>—</span>`;
+        }
+
+        let mobileBadgeHtml = '';
+        if (probe && probe.mobile) {
+          const m = probe.mobile;
+          if (m.status === 'PASS') {
+            const mLat = m.latency ? `${m.latency}ms` : '';
+            mobileBadgeHtml = ` <span class="probe-badge pass" title="Cellular (Tele2 4G): ${m.detail || 'Operational'}"><span class="probe-dot pass"></span>📱 ${mLat}</span>`;
+          } else if (m.status === 'FAIL') {
+            mobileBadgeHtml = ` <span class="probe-badge fail" title="Cellular (Tele2 4G): ${m.detail || 'Blocked by TSPU'}"><span class="probe-dot fail"></span>📱 BLOCKED</span>`;
+          }
         }
 
         const isWg = node.protocol === 'wireguard';
@@ -1146,7 +1157,7 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
               <div class="node-info">
                 <div class="node-name">
                   <span>${node.name}</span>
-                  ${badgeHtml}
+                  ${badgeHtml}${mobileBadgeHtml}
                 </div>
               </div>
             </td>
@@ -1383,7 +1394,8 @@ const server = http.createServer((req, res) => {
             currentNodes[name] = {
               ...currentNodes[name],
               ...info,
-              traffic: info.traffic || currentNodes[name].traffic
+              traffic: info.traffic || currentNodes[name].traffic,
+              mobile: info.mobile || currentNodes[name].mobile
             };
           } else {
             currentNodes[name] = info;
