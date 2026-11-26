@@ -1,6 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SVG Connection Hub</title>
@@ -1061,7 +1062,7 @@
         </label>
         <label class="filter-checkbox-label">
           <input type="checkbox" id="cascaded-only-check" onchange="applyFilters()">
-          <span>🔀 Cascaded only</span>
+          <span>рџ”Ђ Cascaded only</span>
         </label>
         <button id="sort-name-btn" class="sort-btn active" onclick="sortTables('name')">
           <span class="material-symbols-outlined">sort_by_alpha</span> By Name
@@ -1107,7 +1108,7 @@
       rows.forEach(row => {
         const status = row.getAttribute('data-status');
         const name = row.getAttribute('data-name') || '';
-        const isCascade = row.getAttribute('data-cascade') === 'true' || name.includes('🔀') || name.toLowerCase().includes('cascade');
+        const isCascade = row.getAttribute('data-cascade') === 'true' || name.includes('рџ”Ђ') || name.toLowerCase().includes('cascade');
         let show = true;
         if (workingOnly && status !== 'PASS') {
           show = false;
@@ -1231,3 +1232,4 @@
   <!-- STATS_SCRIPT_PLACEHOLDER -->
 </body>
 </html>
+
