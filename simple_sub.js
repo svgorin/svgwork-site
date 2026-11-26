@@ -1,4 +1,4 @@
-const http = require('http');
+﻿const http = require('http');
 const https = require('https');
 const dns = require('dns');
 const fs = require('fs');
@@ -836,6 +836,15 @@ function generateVpsFleetHtml(probeNodes, selectelTele) {
       roleTag: 'TSPU Probe & Cascades',
       status: '🟢 TSPU Probe',
       match: (name, srv) => (srv.includes('Aeza') || name.toLowerCase().includes('aeza')) && !name.toLowerCase().includes('-se') && !name.toLowerCase().includes('-lv')
+    },
+    {
+      id: 'yandex',
+      name: 'Yandex Cloud',
+      flag: '🇷🇺',
+      host: '89.169.130.120 · yc.svgrn.work',
+      roleTag: 'Cascade Inbound Hub',
+      status: '🟢 Inbound Hub',
+      match: (name, srv) => srv.includes('Yandex') || name.toLowerCase().includes('yc-ws-') || name.toLowerCase().includes('yc.svgrn.work')
     },
     {
       id: 'stockholm',
