@@ -1382,7 +1382,8 @@ function serveHtmlPage(res, isAuthorizedStats = false, setCookieHeader = null) {
 
     const headers = {
       "content-type": "text/html; charset=utf-8",
-      "cache-control": "no-store, no-cache, must-revalidate"
+      "cache-control": "no-store, no-cache, must-revalidate",
+      "Refresh": "300"
     };
     if (setCookieHeader) {
       headers["Set-Cookie"] = setCookieHeader;
